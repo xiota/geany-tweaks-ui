@@ -1,0 +1,15 @@
+# Tweaks-UI Plugin for Geany
+
+This plugin provides user-interface tweaks for Geany.
+
+## Features
+
+* Show multiple column markers in the editor.
+* Set a keybinding to switch among Editor, Sidebar, and Message Window.
+* Save different sidebar sizes for different window states.
+* Auto size the sidebar according to window state.
+* Quick access to the Geany user config folder.
+
+## License
+
+This plugin is licensed under the [GPLv3](COPYING) or later.
