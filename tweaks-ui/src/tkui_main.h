@@ -18,26 +18,15 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef XITWEAKS_PLUGIN_H
-#define XITWEAKS_PLUGIN_H
+#pragma once
 
-#include <ctype.h>
-#include <errno.h>
 #include <geanyplugin.h>
-#include <glib.h>
-#include <gtk/gtk.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-extern GeanyKeyGroup *keybindings_get_core_group(guint id);
 
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
 
-extern class TweakSettings settings;
+extern GtkWidget *find_focus_widget(GtkWidget *widget);
+extern GeanyKeyGroup *keybindings_get_core_group(guint id);
 
 enum TweakShortcuts {
   TWEAKS_KEY_SWITCH_FOCUS_EDITOR_SIDEBAR_MSGWIN,
@@ -50,8 +39,8 @@ enum TweakShortcuts {
 };
 
 // Pane Position Callbacks
-void pane_position_update(gboolean enable);
-gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
+// void pane_position_update(gboolean enable);
+// gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
 
 // Preferences Callbacks
 gboolean reload_config(gpointer user_data);
@@ -68,7 +57,6 @@ void on_switch_focus_editor_sidebar_msgwin();
 bool hide_menubar();
 void on_toggle_visibility_menubar();
 bool on_key_binding(int key_id);
-GtkWidget *find_focus_widget(GtkWidget *widget);
 
 // Other functions
 gboolean show_column_markers(gpointer user_data = nullptr);
@@ -110,5 +98,3 @@ gboolean show_column_markers(gpointer user_data = nullptr);
     }                                                  \
   } while (0)
 #endif  // g_clear_signal_handler
-
-#endif  // XITWEAKS_PLUGIN_H

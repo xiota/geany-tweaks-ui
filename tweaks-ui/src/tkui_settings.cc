@@ -19,14 +19,11 @@
  */
 
 #include "auxiliary.h"
-#include "prefs.h"
-
-// Global Variables
-TweakSettings settings;
+#include "tkui_settings.h"
 
 // Functions
 
-void TweakSettings::open() {
+void TweakUISettings::open() {
   std::string conf_fn =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
@@ -50,7 +47,7 @@ void TweakSettings::open() {
   GKEY_FILE_FREE(kf);
 }
 
-void TweakSettings::save_default() {
+void TweakUISettings::save_default() {
   std::string conf_fn =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
@@ -74,7 +71,7 @@ void TweakSettings::save_default() {
   g_object_unref(file);
 }
 
-void TweakSettings::save() {
+void TweakUISettings::save() {
   GKeyFile *kf = g_key_file_new();
   std::string fn =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
@@ -122,7 +119,7 @@ void TweakSettings::save() {
   GKEY_FILE_FREE(kf);
 }
 
-void TweakSettings::load(GKeyFile *kf) {
+void TweakUISettings::load(GKeyFile *kf) {
   if (!g_key_file_has_group(kf, "tweaks")) {
     return;
   }

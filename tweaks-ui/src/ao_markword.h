@@ -26,9 +26,6 @@
 
 #include "tkui_addon.h"
 
-extern GeanyPlugin *geany_plugin;
-extern GeanyData *geany_data;
-
 G_BEGIN_DECLS
 
 #define AO_MARKWORD_TYPE (ao_mark_word_get_type())

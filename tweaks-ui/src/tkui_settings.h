@@ -18,17 +18,13 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef XITWEAKS_PREFS_H
-#define XITWEAKS_PREFS_H
+#pragma once
 
-#include "plugin.h"
 #include "tkui_column_markers.h"
+#include "tkui_main.h"
 
-class TweakSettings {
+class TweakUISettings {
  public:
-  TweakSettings() = default;
-  ~TweakSettings() { save(); }
-
   void open();
   void load(GKeyFile *kf);
   void save();
@@ -141,5 +137,3 @@ class TweakSettings {
     column_marker_columns.push_back(col); \
     column_marker_colors.push_back(bgr);  \
   } while (0)
-
-#endif  // XITWEAKS_PREFS_H
