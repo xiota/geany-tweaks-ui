@@ -17,7 +17,9 @@ tweaks_ui_la_SOURCES = \
 	ao_colortip.c \
 	ao_colortip.h \
 	ao_markword.c \
-	ao_markword.h
+	ao_markword.h \
+	tkui_column_markers.cc \
+	tkui_column_markers.h
 
 tweaks_ui_la_CXXFLAGS = $(AM_CFLAGS) \
 	-DG_LOG_DOMAIN=\""Tweaks-UI"\" \

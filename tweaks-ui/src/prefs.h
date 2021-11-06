@@ -22,10 +22,11 @@
 #define XITWEAKS_PREFS_H
 
 #include "plugin.h"
+#include "tkui_column_markers.h"
 
 class TweakSettings {
  public:
-  TweakSettings();
+  TweakSettings() = default;
   ~TweakSettings() { save(); }
 
   void open();
@@ -43,14 +44,11 @@ class TweakSettings {
   int sidebar_auto_size_normal = 76;
   int sidebar_auto_size_maximized = 100;
 
-  gboolean column_marker_enable = false;
-  int column_marker_count = 0;
-  std::vector<int> column_marker_columns;
-  std::vector<int> column_marker_colors;
-
   gboolean menubar_hide_on_start = false;
   gboolean menubar_restore_state = false;
   gboolean menubar_previous_state = true;
+
+  tkuiColumnMarkers column_markers;
 };
 
 // Macros to make loading settings easier

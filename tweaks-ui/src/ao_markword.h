@@ -24,9 +24,7 @@
 #ifndef __AO_MARKWORD_H__
 #define __AO_MARKWORD_H__
 
-#include <geanyplugin.h>
-#include <glib-object.h>
-#include <gtk/gtk.h>
+#include "tkui_addon.h"
 
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
