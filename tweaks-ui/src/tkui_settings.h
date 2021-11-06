@@ -23,12 +23,20 @@
 #include "tkui_column_markers.h"
 #include "tkui_main.h"
 
+#define TKUI_KF_GROUP "tweaks"
+
 class TweakUISettings {
  public:
+  ~TweakUISettings();
+
   void open();
-  void load(GKeyFile *kf);
+  void close();
+  void load();
   void save();
-  void save_default();
+  void reset();
+
+  std::string get_config_file() const { return config_file; }
+  std::string get_session_file() const { return session_file; }
 
  public:
   gboolean sidebar_save_size_enabled = true;
@@ -45,95 +53,30 @@ class TweakUISettings {
   gboolean menubar_previous_state = true;
 
   tkuiColumnMarkers column_markers;
+
+ private:
+  bool kf_has_key(std::string const &key);
+
+  void kf_set_boolean(std::string const &key, bool const &val);
+  bool kf_get_boolean(std::string const &key, bool const &def);
+
+  void kf_set_integer(std::string const &key, int const &val);
+  int kf_get_integer(std::string const &key, int const &def, int const &min);
+
+  void kf_set_string(std::string const &key, std::string const &val);
+  std::string kf_get_string(std::string const &key, std::string const &def);
+
+ private:
+  GKeyFile *keyfile = nullptr;
+  GKeyFile *session = nullptr;
+  std::string config_file;
+  std::string session_file;
 };
 
 // Macros to make loading settings easier
-#define PLUGIN_GROUP "tweaks"
 
-#define HAS_KEY(key) g_key_file_has_key(kf, PLUGIN_GROUP, (key), nullptr)
-#define GET_KEY(T, key) g_key_file_get_##T(kf, PLUGIN_GROUP, (key), nullptr)
+#define GET_KEY(T, key) \
+  g_key_file_get_##T(keyfile, TKUI_KF_GROUP, (key), nullptr)
+
 #define SET_KEY(T, key, _val) \
-  g_key_file_set_##T(kf, PLUGIN_GROUP, (key), (_val))
-
-#define SET_KEY_STRING(key, _val) \
-  g_key_file_set_string(kf, PLUGIN_GROUP, (key), (_val.c_str()))
-
-#define GET_KEY_STRING(var, key, def)   \
-  do {                                  \
-    if (HAS_KEY(key)) {                 \
-      char *val = GET_KEY(string, key); \
-      if (val) {                        \
-        (var) = cstr_assign(val);       \
-      } else {                          \
-        (var) = std::string(def);       \
-      }                                 \
-    }                                   \
-  } while (0)
-
-#define SET_KEY_VALUE(key, _val) \
-  g_key_file_set_value(kf, PLUGIN_GROUP, (key), (_val.c_str()))
-
-#define GET_KEY_VALUE(var, key, def)   \
-  do {                                 \
-    if (HAS_KEY(#key)) {               \
-      char *val = GET_KEY(value, key); \
-      if (val) {                       \
-        (var) = cstr_assign(val);      \
-      } else {                         \
-        (var) = std::string(def);      \
-      }                                \
-    }                                  \
-  } while (0)
-
-#define GET_KEY_BOOLEAN(key, def)   \
-  do {                              \
-    if (HAS_KEY(#key)) {            \
-      key = GET_KEY(boolean, #key); \
-    } else {                        \
-      key = (def);                  \
-    }                               \
-  } while (0)
-
-#define GET_KEY_INTEGER(key, def, min)  \
-  do {                                  \
-    if (HAS_KEY(#key)) {                \
-      int val = GET_KEY(integer, #key); \
-      if (val) {                        \
-        if (val < (min)) {              \
-          key = (min);                  \
-        } else {                        \
-          key = val;                    \
-        }                               \
-      } else {                          \
-        key = (def);                    \
-      }                                 \
-    }                                   \
-  } while (0)
-
-#define GET_KEY_DOUBLE(key, def, min)  \
-  do {                                 \
-    if (HAS_KEY(#key)) {               \
-      int val = GET_KEY(double, #key); \
-      if (val) {                       \
-        if (val < (min)) {             \
-          key = (min);                 \
-        } else {                       \
-          key = val;                   \
-        }                              \
-      } else {                         \
-        key = (def);                   \
-      }                                \
-    }                                  \
-  } while (0)
-
-#define GKEY_FILE_FREE(_z_) \
-  do {                      \
-    g_key_file_free(_z_);   \
-    _z_ = nullptr;          \
-  } while (0)
-
-#define ADD_COLUMN_MARKER(col, bgr)       \
-  do {                                    \
-    column_marker_columns.push_back(col); \
-    column_marker_colors.push_back(bgr);  \
-  } while (0)
+  g_key_file_set_##T(keyfile, TKUI_KF_GROUP, (key), (_val))

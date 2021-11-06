@@ -21,132 +21,192 @@
 #include "auxiliary.h"
 #include "tkui_settings.h"
 
-// Functions
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TweakUISettings::~TweakUISettings() { close(); }
 
 void TweakUISettings::open() {
-  std::string conf_fn =
+  keyfile = g_key_file_new();
+
+  config_file =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
-  std::string conf_dn = g_path_get_dirname(conf_fn.c_str());
+  std::string conf_dn = g_path_get_dirname(config_file.c_str());
   g_mkdir_with_parents(conf_dn.c_str(), 0755);
-
-  GKeyFile *kf = g_key_file_new();
 
   // if file does not exist, create it
-  if (!g_file_test(conf_fn.c_str(), G_FILE_TEST_EXISTS)) {
-    save_default();
+  if (!g_file_test(config_file.c_str(), G_FILE_TEST_EXISTS)) {
+    reset();
   }
-
-  g_key_file_load_from_file(
-      kf, conf_fn.c_str(),
-      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
-      nullptr);
-
-  load(kf);
-
-  GKEY_FILE_FREE(kf);
 }
 
-void TweakUISettings::save_default() {
-  std::string conf_fn =
-      cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
-                                   "tweaks", "tweaks-ui.conf", nullptr));
-  std::string conf_dn = cstr_assign(g_path_get_dirname(conf_fn.c_str()));
-  g_mkdir_with_parents(conf_dn.c_str(), 0755);
+void TweakUISettings::close() {
+  if (keyfile) {
+    g_key_file_free(keyfile);
+    keyfile = nullptr;
+  }
+}
 
-  // delete if file exists
-  GFile *file = g_file_new_for_path(conf_fn.c_str());
-  if (!g_file_trash(file, nullptr, nullptr)) {
-    g_file_delete(file, nullptr, nullptr);
+void TweakUISettings::reset() {
+  if (config_file.empty()) {
+    open();
+  }
+
+  {  // delete if file exists
+    GFile *file = g_file_new_for_path(config_file.c_str());
+    if (!g_file_trash(file, nullptr, nullptr)) {
+      g_file_delete(file, nullptr, nullptr);
+    }
+    g_object_unref(file);
   }
 
   // copy default config
   std::string contents = file_get_contents(TWEAKS_CONFIG);
   if (!contents.empty()) {
-    file_set_contents(conf_fn, contents);
+    file_set_contents(config_file, contents);
   }
-
-  msgwin_status_add(TWEAKS_CONFIG);
-
-  g_object_unref(file);
 }
 
 void TweakUISettings::save() {
-  GKeyFile *kf = g_key_file_new();
-  std::string fn =
-      cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
-                                   "tweaks", "tweaks-ui.conf", nullptr));
+  if (!keyfile) {
+    return;
+  }
 
   // Load old contents in case user changed file outside of GUI
   g_key_file_load_from_file(
-      kf, fn.c_str(),
+      keyfile, config_file.c_str(),
       GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
       nullptr);
 
-  SET_KEY(boolean, "sidebar_save_size_enabled", sidebar_save_size_enabled);
-  SET_KEY(boolean, "sidebar_save_size_update", sidebar_save_size_update);
-  SET_KEY(integer, "sidebar_save_size_normal", sidebar_save_size_normal);
-  SET_KEY(integer, "sidebar_save_size_maximized", sidebar_save_size_maximized);
+  kf_set_boolean("sidebar_save_size_enabled", sidebar_save_size_enabled);
+  kf_set_boolean("sidebar_save_size_update", sidebar_save_size_update);
+  kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
+  kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
 
-  SET_KEY(boolean, "sidebar_auto_size_enabled", sidebar_auto_size_enabled);
-  SET_KEY(integer, "sidebar_auto_size_normal", sidebar_auto_size_normal);
-  SET_KEY(integer, "sidebar_auto_size_maximized", sidebar_auto_size_maximized);
+  kf_set_boolean("sidebar_auto_size_enabled", sidebar_auto_size_enabled);
+  kf_set_integer("sidebar_auto_size_normal", sidebar_auto_size_normal);
+  kf_set_integer("sidebar_auto_size_maximized", sidebar_auto_size_maximized);
 
-  SET_KEY(boolean, "menubar_hide_on_start", menubar_hide_on_start);
-  SET_KEY(boolean, "menubar_restore_state", menubar_restore_state);
+  kf_set_boolean("menubar_hide_on_start", menubar_hide_on_start);
+  kf_set_boolean("menubar_restore_state", menubar_restore_state);
 
   GtkWidget *geany_menubar =
       ui_lookup_widget(GTK_WIDGET(geany->main_widgets->window), "hbox_menubar");
   menubar_previous_state = gtk_widget_is_visible(geany_menubar);
-  SET_KEY(boolean, "menubar_previous_state", menubar_previous_state);
+  kf_set_boolean("menubar_previous_state", menubar_previous_state);
 
-  SET_KEY(boolean, "column_marker_enable", column_markers.enable);
+  kf_set_boolean("column_marker_enable", column_markers.enable);
 
   {
     std::string str_columns;
     std::string str_colors;
     column_markers.get_columns(str_columns, str_colors);
-    SET_KEY_STRING("column_marker_columns", str_columns);
-    SET_KEY_STRING("column_marker_colors", str_colors);
+    kf_set_string("column_marker_columns", str_columns);
+    kf_set_string("column_marker_colors", str_colors);
   }
 
   // Store back on disk
-  std::string contents = cstr_assign(g_key_file_to_data(kf, nullptr, nullptr));
+  std::string contents =
+      cstr_assign(g_key_file_to_data(keyfile, nullptr, nullptr));
   if (!contents.empty()) {
-    file_set_contents(fn, contents);
+    file_set_contents(config_file, contents);
   }
-
-  GKEY_FILE_FREE(kf);
 }
 
-void TweakUISettings::load(GKeyFile *kf) {
-  if (!g_key_file_has_group(kf, "tweaks")) {
+void TweakUISettings::load() {
+  if (!keyfile || !g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
     return;
   }
 
-  GET_KEY_BOOLEAN(sidebar_save_size_enabled, true);
-  GET_KEY_BOOLEAN(sidebar_save_size_update, true);
-  GET_KEY_INTEGER(sidebar_save_size_normal, 0, 0);
-  GET_KEY_INTEGER(sidebar_save_size_maximized, 0, 0);
+  g_key_file_load_from_file(
+      keyfile, config_file.c_str(),
+      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+      nullptr);
 
-  GET_KEY_BOOLEAN(sidebar_auto_size_enabled, false);
-  GET_KEY_INTEGER(sidebar_auto_size_normal, 76, 0);
-  GET_KEY_INTEGER(sidebar_auto_size_maximized, 100, 0);
+  sidebar_save_size_enabled = kf_get_boolean("sidebar_save_size_enabled", true);
+  sidebar_save_size_update = kf_get_boolean("sidebar_save_size_update", true);
+  sidebar_save_size_normal = kf_get_integer("sidebar_save_size_normal", 0, 0);
+  sidebar_save_size_maximized =
+      kf_get_integer("sidebar_save_size_maximized", 0, 0);
 
-  GET_KEY_BOOLEAN(menubar_hide_on_start, false);
-  GET_KEY_BOOLEAN(menubar_restore_state, false);
-  GET_KEY_BOOLEAN(menubar_previous_state, true);
+  sidebar_auto_size_enabled =
+      kf_get_boolean("sidebar_auto_size_enabled", false);
+  sidebar_auto_size_normal = kf_get_integer("sidebar_auto_size_normal", 76, 0);
+  sidebar_auto_size_maximized =
+      kf_get_integer("sidebar_auto_size_maximized", 100, 0);
 
-  GET_KEY_BOOLEAN(column_markers.enable, true);
+  menubar_hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
+  menubar_restore_state = kf_get_boolean("menubar_restore_state", false);
+  menubar_previous_state = kf_get_boolean("menubar_previous_state", true);
+
+  column_markers.enable = kf_get_boolean("column_markers.enable", true);
 
   {
     std::string str_columns;
     std::string str_colors;
 
-    GET_KEY_STRING(str_columns, "column_marker_columns", "60;72;80;88;96;");
-    GET_KEY_STRING(str_colors, "column_marker_colors",
-                   "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;");
+    str_columns = kf_get_string("column_marker_columns", "60;72;80;88;96;");
+    str_colors = kf_get_string("column_marker_colors",
+                               "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;");
 
     column_markers.set_columns(str_columns, str_colors);
   }
 }
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Keyfile operations
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+bool TweakUISettings::kf_has_key(std::string const &key) {
+  return g_key_file_has_key(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
+}
+
+void TweakUISettings::kf_set_boolean(std::string const &key, bool const &val) {
+  g_key_file_set_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), val);
+}
+
+bool TweakUISettings::kf_get_boolean(std::string const &key, bool const &def) {
+  if (kf_has_key(key)) {
+    return g_key_file_get_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
+  } else {
+    return def;
+  }
+}
+
+void TweakUISettings::kf_set_integer(std::string const &key, int const &val) {
+  g_key_file_set_integer(keyfile, TKUI_KF_GROUP, key.c_str(), val);
+}
+
+int TweakUISettings::kf_get_integer(std::string const &key, int const &def,
+                                    int const &min) {
+  if (kf_has_key(key)) {
+    int val =
+        g_key_file_get_integer(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
+
+    if (val < min) {
+      return min;
+    } else {
+      return val;
+    }
+  } else {
+    return def;
+  }
+}
+
+void TweakUISettings::kf_set_string(std::string const &key,
+                                    std::string const &val) {
+  g_key_file_set_string(keyfile, TKUI_KF_GROUP, key.c_str(), val.c_str());
+}
+
+std::string TweakUISettings::kf_get_string(std::string const &key,
+                                           std::string const &def) {
+  if (kf_has_key(key)) {
+    char *val =
+        g_key_file_get_string(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
+    return cstr_assign(val);
+  } else {
+    return def;
+  }
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
