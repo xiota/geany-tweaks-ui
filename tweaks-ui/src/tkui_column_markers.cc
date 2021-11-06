@@ -1,10 +1,10 @@
 /*
- * Column Markers, Tweaks-UI Plugin for Geany
+ * Column Markers - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,9 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "auxiliary.h"
@@ -47,22 +45,24 @@ void tkuiColumnMarkers::add_column(int nColumn, int nColor) {
 }
 
 void tkuiColumnMarkers::show() {
-  if (enable) {
-    GeanyDocument *doc = document_get_current();
-    g_return_if_fail(DOC_VALID(doc));
+  if (!enable) {
+    return;
+  }
 
-    scintilla_send_message(doc->editor->sci, SCI_SETEDGEMODE, 3, 3);
-    scintilla_send_message(doc->editor->sci, SCI_MULTIEDGECLEARALL, 0, 0);
+  GeanyDocument *doc = document_get_current();
+  g_return_if_fail(DOC_VALID(doc));
 
-    if (!vn_columns.empty() && !vn_colors.empty()) {
-      const int cnt_col = vn_columns.size();
-      const int cnt_clr = vn_colors.size();
-      const int count = cnt_col > cnt_clr ? cnt_clr : cnt_col;
+  scintilla_send_message(doc->editor->sci, SCI_SETEDGEMODE, 3, 3);
+  scintilla_send_message(doc->editor->sci, SCI_MULTIEDGECLEARALL, 0, 0);
 
-      for (int i = 0; i < count; i++) {
-        scintilla_send_message(doc->editor->sci, SCI_MULTIEDGEADDLINE,
-                               vn_columns[i], vn_colors[i]);
-      }
+  if (!vn_columns.empty() && !vn_colors.empty()) {
+    const int cnt_col = vn_columns.size();
+    const int cnt_clr = vn_colors.size();
+    const int count = cnt_col > cnt_clr ? cnt_clr : cnt_col;
+
+    for (int i = 0; i < count; i++) {
+      scintilla_send_message(doc->editor->sci, SCI_MULTIEDGEADDLINE,
+                             vn_columns[i], vn_colors[i]);
     }
   }
 }

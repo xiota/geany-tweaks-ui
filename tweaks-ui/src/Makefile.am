@@ -14,6 +14,8 @@ tweaks_ui_la_SOURCES = \
 	tkui_settings.h \
 	tkui_column_markers.cc \
 	tkui_column_markers.h \
+	tkui_hide_menubar.cc \
+	tkui_hide_menubar.h \
 	auxiliary.cc \
 	auxiliary.h \
 	ao_colortip.c \

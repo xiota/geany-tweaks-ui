@@ -1,5 +1,5 @@
-/* -*- C++ -*-
- * Fountain Screenplay Processor - auxiliary functions
+/*
+ * Auxiliary Functions - Fountain Screenplay Processor
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
