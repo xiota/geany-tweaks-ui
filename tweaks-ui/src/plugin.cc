@@ -36,54 +36,85 @@
 GeanyPlugin *geany_plugin;
 GeanyData *geany_data;
 
-static GtkWindow *geany_window = nullptr;
-static GtkNotebook *geany_sidebar = nullptr;
-static GtkNotebook *geany_msgwin = nullptr;
-static GtkNotebook *geany_editor = nullptr;
-static GtkWidget *geany_hpane = nullptr;
-static GtkWidget *geany_menubar = nullptr;
+namespace {
+
+GtkWindow *geany_window = nullptr;
+GtkNotebook *geany_sidebar = nullptr;
+GtkNotebook *geany_msgwin = nullptr;
+GtkNotebook *geany_editor = nullptr;
+GtkWidget *geany_hpane = nullptr;
+GtkWidget *geany_menubar = nullptr;
 
 GtkWidget *g_tweaks_menu = nullptr;
 
-static gulong g_handle_pane_position = 0;
-static gulong g_handle_column_markers = 0;
-static gulong g_handle_reload_config = 0;
+gulong g_handle_pane_position = 0;
+gulong g_handle_reload_config = 0;
 
-static AoMarkWord *g_markword = nullptr;
-static AoColorTip *g_colortip = nullptr;
+AoMarkWord *g_markword = nullptr;
+AoColorTip *g_colortip = nullptr;
 
-static GeanyKeyGroup *gKeyGroup = nullptr;
+GeanyKeyGroup *gKeyGroup = nullptr;
 
 /* ********************
- * Plugin Setup
+ * Geany Signal Callbacks
  */
-PLUGIN_VERSION_CHECK(225)
 
-PLUGIN_SET_INFO("Tweaks-UI", "User-interface tweaks for Geany.", "0.01.0",
-                "xiota")
+bool on_editor_notify(GObject *object, GeanyEditor *editor, SCNotification *nt,
+                      gpointer data) {
+  ao_mark_editor_notify(g_markword, editor, nt);
+  ao_color_tip_editor_notify(g_colortip, editor, nt);
 
-void plugin_init(GeanyData *data) {
-  GEANY_PSC("geany-startup-complete", on_startup_signal);
-  GEANY_PSC("document-activate", on_document_activate);
-  GEANY_PSC("document-new", on_document_new);
-  GEANY_PSC("document-open", on_document_open);
-  GEANY_PSC("document-close", on_document_close);
-  GEANY_PSC("document-reload", on_document_reload);
-  GEANY_PSC("project-open", on_project_signal);
-  GEANY_PSC("project-close", on_project_signal);
-  GEANY_PSC("project-save", on_project_signal);
-  GEANY_PSC("editor-notify", on_editor_notify);
-
-  tweaks_init(geany_plugin, geany_data);
+  return false;
 }
 
-void plugin_cleanup(void) { tweaks_cleanup(geany_plugin, geany_data); }
+void on_document_activate(GObject *obj, GeanyDocument *doc, gpointer data) {
+  g_return_if_fail(doc != NULL && doc->is_valid);
 
-GtkWidget *plugin_configure(GtkDialog *dlg) {
-  return tweaks_configure(geany_plugin, dlg, geany_data);
+  settings.column_markers.show_idle();
 }
 
-// void plugin_help(void) { }
+void on_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
+  g_return_if_fail(doc != NULL && doc->is_valid);
+
+  ao_mark_document_new(g_markword, doc);
+  ao_color_tip_document_new(g_colortip, doc);
+
+  settings.column_markers.show_idle();
+}
+
+void on_document_open(GObject *obj, GeanyDocument *doc, gpointer data) {
+  g_return_if_fail(doc != NULL && doc->is_valid);
+
+  ao_mark_document_open(g_markword, doc);
+  ao_color_tip_document_open(g_colortip, doc);
+
+  settings.column_markers.show_idle();
+}
+
+void on_document_close(GObject *obj, GeanyDocument *doc, gpointer data) {
+  g_return_if_fail(doc != NULL && doc->is_valid);
+
+  ao_mark_document_close(g_markword, doc);
+  ao_color_tip_document_close(g_colortip, doc);
+}
+
+void on_document_reload(GObject *obj, GeanyDocument *doc, gpointer data) {
+  g_return_if_fail(doc != NULL && doc->is_valid);
+
+  settings.column_markers.show_idle();
+}
+
+void on_startup_complete(GObject *obj, GeanyDocument *doc, gpointer data) {
+  settings.column_markers.show_idle();
+}
+
+void on_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
+  settings.column_markers.show_idle();
+}
+
+/* ********************
+ * Plugin Functions
+ */
 
 gboolean tweaks_init(GeanyPlugin *plugin, gpointer data) {
   geany_plugin = plugin;
@@ -99,7 +130,7 @@ gboolean tweaks_init(GeanyPlugin *plugin, gpointer data) {
 
   settings.open();
 
-  // set up menu
+  // setup menu
   GtkWidget *item;
 
   g_tweaks_menu = gtk_menu_item_new_with_label("Tweaks-UI");
@@ -235,6 +266,42 @@ GtkWidget *tweaks_configure(GeanyPlugin *plugin, GtkDialog *dialog,
   return box;
 }
 
+PluginCallback tweaks_callbacks[] = {
+    {"document-activate", (GCallback)&on_document_activate, true, nullptr},
+    {"document-close", (GCallback)&on_document_close, true, nullptr},
+    {"document-new", (GCallback)&on_document_new, true, nullptr},
+    {"document-open", (GCallback)&on_document_open, true, nullptr},
+    {"document-reload", (GCallback)&on_document_reload, true, nullptr},
+    {"editor-notify", (GCallback)&on_editor_notify, true, nullptr},
+    {"geany-startup-complete", (GCallback)&on_startup_complete, true, nullptr},
+    {"project-close", (GCallback)&on_project_signal, true, nullptr},
+    {"project-open", (GCallback)&on_project_signal, true, nullptr},
+    {"project-save", (GCallback)&on_project_signal, true, nullptr},
+    {nullptr, nullptr, false, nullptr}};
+}  // namespace
+
+G_MODULE_EXPORT
+void geany_load_module(GeanyPlugin *plugin) {
+  // translation
+  main_locale_init(LOCALEDIR, GETTEXT_PACKAGE);
+
+  // plugin metadata
+  plugin->info->name = "Tweaks-UI";
+  plugin->info->description = _("User-interface tweaks for Geany.");
+  plugin->info->version = VERSION;
+  plugin->info->author = "xiota";
+
+  // plugin functions
+  plugin->funcs->init = tweaks_init;
+  plugin->funcs->cleanup = tweaks_cleanup;
+  plugin->funcs->help = nullptr;
+  plugin->funcs->configure = tweaks_configure;
+  plugin->funcs->callbacks = tweaks_callbacks;
+
+  // register
+  GEANY_PLUGIN_REGISTER(plugin, 226);
+}
+
 /* ********************
  * Preferences Callbacks
  */
@@ -254,10 +321,7 @@ gboolean reload_config(gpointer user_data) {
   pane_position_update(settings.sidebar_save_size_enabled ||
                        settings.sidebar_auto_size_enabled);
 
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
+  settings.column_markers.show_idle();
 
   g_handle_reload_config = 0;
   return FALSE;
@@ -492,107 +556,5 @@ GtkWidget *find_focus_widget(GtkWidget *widget) {
 }
 
 /* ********************
- * Geany Signal Callbacks
+ * Idle Callbacks
  */
-
-bool on_editor_notify(GObject *object, GeanyEditor *editor, SCNotification *nt,
-                      gpointer data) {
-  ao_mark_editor_notify(g_markword, editor, nt);
-  ao_color_tip_editor_notify(g_colortip, editor, nt);
-
-  return FALSE;
-}
-
-void on_document_activate(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
-}
-
-void on_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  ao_mark_document_new(g_markword, doc);
-  ao_color_tip_document_new(g_colortip, doc);
-
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
-}
-
-void on_document_open(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  ao_mark_document_open(g_markword, doc);
-  ao_color_tip_document_open(g_colortip, doc);
-
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
-}
-
-void on_document_close(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  ao_mark_document_close(g_markword, doc);
-  ao_color_tip_document_close(g_colortip, doc);
-}
-
-void on_document_reload(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
-}
-
-void on_startup_signal(GObject *obj, GeanyDocument *doc, gpointer data) {
-  if (g_handle_reload_config == 0) {
-    g_handle_reload_config = 1;
-    g_idle_add(reload_config, nullptr);
-  }
-}
-
-void on_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
-  if (g_handle_column_markers == 0) {
-    g_handle_column_markers = 1;
-    g_idle_add(show_column_markers, nullptr);
-  }
-}
-
-/* ********************
- * Other Functions
- */
-
-gboolean show_column_markers(gpointer user_data) {
-  GeanyDocument *doc = document_get_current();
-  g_return_val_if_fail(DOC_VALID(doc), false);
-
-  if (settings.column_marker_enable) {
-    scintilla_send_message(doc->editor->sci, SCI_SETEDGEMODE, 3, 3);
-    scintilla_send_message(doc->editor->sci, SCI_MULTIEDGECLEARALL, 0, 0);
-
-    if (!settings.column_marker_columns.empty() &&
-        !settings.column_marker_colors.empty()) {
-      int cnt_col = settings.column_marker_columns.size();
-      int cnt_clr = settings.column_marker_colors.size();
-      int count = cnt_col > cnt_clr ? cnt_clr : cnt_col;
-
-      for (int i = 0; i < count; i++) {
-        scintilla_send_message(doc->editor->sci, SCI_MULTIEDGEADDLINE,
-                               settings.column_marker_columns[i],
-                               settings.column_marker_colors[i]);
-      }
-    }
-  }
-
-  g_handle_column_markers = 0;
-
-  return false;
-}

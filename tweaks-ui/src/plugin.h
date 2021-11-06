@@ -49,12 +49,6 @@ enum TweakShortcuts {
   TWEAKS_KEY_COUNT,
 };
 
-// Plugin Setup
-gboolean tweaks_init(GeanyPlugin *plugin, gpointer data);
-void tweaks_cleanup(GeanyPlugin *plugin, gpointer data);
-GtkWidget *tweaks_configure(GeanyPlugin *plugin, GtkDialog *dialog,
-                            gpointer pdata);
-
 // Pane Position Callbacks
 void pane_position_update(gboolean enable);
 gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
@@ -75,17 +69,6 @@ bool hide_menubar();
 void on_toggle_visibility_menubar();
 bool on_key_binding(int key_id);
 GtkWidget *find_focus_widget(GtkWidget *widget);
-
-// Geany Signal Callbacks
-bool on_editor_notify(GObject *object, GeanyEditor *editor, SCNotification *nt,
-                      gpointer data);
-void on_document_activate(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_document_new(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_document_open(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_document_close(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_document_reload(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_startup_signal(GObject *obj, GeanyDocument *doc, gpointer data);
-void on_project_signal(GObject *obj, GKeyFile *config, gpointer data);
 
 // Other functions
 gboolean show_column_markers(gpointer user_data = nullptr);
