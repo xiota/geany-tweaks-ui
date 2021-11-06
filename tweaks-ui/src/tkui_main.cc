@@ -27,8 +27,8 @@
 #include "ao_colortip.h"
 #include "ao_markword.h"
 #include "auxiliary.h"
-#include "tkui_settings.h"
 #include "tkui_main.h"
+#include "tkui_settings.h"
 
 /* ********************
  * Globals
@@ -131,6 +131,7 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   geany_menubar = ui_lookup_widget(GTK_WIDGET(geany_window), "hbox_menubar");
 
   settings.open();
+  settings.load();
 
   // setup menu
   GtkWidget *item;
@@ -217,7 +218,7 @@ void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
 }
 
 GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
-                            gpointer pdata) {
+                                 gpointer pdata) {
   GtkWidget *box, *btn;
   char *tooltip;
 
@@ -309,7 +310,7 @@ void geany_load_module(GeanyPlugin *plugin) {
  */
 
 gboolean reload_config(gpointer user_data) {
-  settings.open();
+  settings.load();
 
   if (settings.menubar_hide_on_start) {
     hide_menubar();
@@ -341,7 +342,7 @@ void on_pref_save_config(GtkWidget *self, GtkWidget *dialog) {
 }
 
 void on_pref_reset_config(GtkWidget *self, GtkWidget *dialog) {
-  settings.save_default();
+  settings.reset();
 }
 
 void on_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
@@ -353,12 +354,13 @@ void on_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
 }
 
 void on_pref_edit_config(GtkWidget *self, GtkWidget *dialog) {
-  settings.open();
-  std::string conf_fn =
-      cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
-                                   "tweaks", "tweaks-ui.conf", nullptr));
+  const std::string &filename = settings.get_config_file();
+  if (filename.empty()) {
+    return;
+  }
+
   GeanyDocument *doc =
-      document_open_file(conf_fn.c_str(), false, nullptr, nullptr);
+      document_open_file(filename.c_str(), false, nullptr, nullptr);
   document_reload_force(doc, nullptr);
 
   if (dialog != nullptr) {
@@ -469,7 +471,7 @@ void on_switch_focus_editor_sidebar_msgwin() {
   if (doc != nullptr) {
     gint cur_page = gtk_notebook_get_current_page(geany_sidebar);
     GtkWidget *page = gtk_notebook_get_nth_page(geany_sidebar, cur_page);
-    //page = find_focus_widget(page);
+    // page = find_focus_widget(page);
 
     if (gtk_widget_has_focus(GTK_WIDGET(doc->editor->sci)) &&
         gtk_widget_is_visible(GTK_WIDGET(geany_sidebar))) {
