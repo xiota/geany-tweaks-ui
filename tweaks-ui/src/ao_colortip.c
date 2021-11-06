@@ -331,3 +331,10 @@ AoColorTip *ao_color_tip_new(gboolean enable_tip,
                       "enable-double-click-color-chooser",
                       double_click_color_chooser, NULL);
 }
+
+void ao_color_tip_set(AoColorTip *self, gboolean enable_tip,
+                      gboolean double_click_color_chooser) {
+  g_object_set(self, "enable-colortip", enable_tip,
+               "enable-double-click-color-chooser", double_click_color_chooser,
+               NULL);
+}

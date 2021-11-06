@@ -2,9 +2,9 @@
  * Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,9 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -50,8 +48,8 @@ GtkWidget *g_tweaks_menu = nullptr;
 gulong g_handle_pane_position = 0;
 gulong g_handle_reload_config = 0;
 
-AoMarkWord *g_markword = nullptr;
-AoColorTip *g_colortip = nullptr;
+AoMarkWord *gMarkWord = nullptr;
+AoColorTip *gColorTip = nullptr;
 
 GeanyKeyGroup *gKeyGroup = nullptr;
 
@@ -61,56 +59,57 @@ TweakUISettings settings;
  * Geany Signal Callbacks
  */
 
-bool on_editor_notify(GObject *object, GeanyEditor *editor, SCNotification *nt,
-                      gpointer data) {
-  ao_mark_editor_notify(g_markword, editor, nt);
-  ao_color_tip_editor_notify(g_colortip, editor, nt);
+bool tkui_signal_editor_notify(GObject *object, GeanyEditor *editor,
+                        SCNotification *nt, gpointer data) {
+  ao_mark_editor_notify(gMarkWord, editor, nt);
+  ao_color_tip_editor_notify(gColorTip, editor, nt);
 
   return false;
 }
 
-void on_document_activate(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_document_activate(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
   settings.column_markers.show_idle();
 }
 
-void on_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_new(g_markword, doc);
-  ao_color_tip_document_new(g_colortip, doc);
+  ao_mark_document_new(gMarkWord, doc);
+  ao_color_tip_document_new(gColorTip, doc);
 
   settings.column_markers.show_idle();
 }
 
-void on_document_open(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_document_open(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_open(g_markword, doc);
-  ao_color_tip_document_open(g_colortip, doc);
+  ao_mark_document_open(gMarkWord, doc);
+  ao_color_tip_document_open(gColorTip, doc);
 
   settings.column_markers.show_idle();
 }
 
-void on_document_close(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_document_close(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_close(g_markword, doc);
-  ao_color_tip_document_close(g_colortip, doc);
+  ao_mark_document_close(gMarkWord, doc);
+  ao_color_tip_document_close(gColorTip, doc);
 }
 
-void on_document_reload(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_document_reload(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
   settings.column_markers.show_idle();
 }
 
-void on_startup_complete(GObject *obj, GeanyDocument *doc, gpointer data) {
+void tkui_signal_startup_complete(GObject *obj, GeanyDocument *doc, gpointer data) {
+  settings.hide_menubar.startup();
   settings.column_markers.show_idle();
 }
 
-void on_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
+void tkui_signal_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
   settings.column_markers.show_idle();
 }
 
@@ -143,16 +142,17 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(g_tweaks_menu), submenu);
 
   item = gtk_menu_item_new_with_label("Edit Config File");
-  g_signal_connect(item, "activate", G_CALLBACK(on_pref_edit_config), nullptr);
+  g_signal_connect(item, "activate", G_CALLBACK(tkui_pref_edit_config),
+                   nullptr);
   gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
 
   item = gtk_menu_item_new_with_label("Reload Config File");
-  g_signal_connect(item, "activate", G_CALLBACK(on_pref_reload_config),
+  g_signal_connect(item, "activate", G_CALLBACK(tkui_pref_reload_config),
                    nullptr);
   gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
 
   item = gtk_menu_item_new_with_label("Open Config Folder");
-  g_signal_connect(item, "activate", G_CALLBACK(on_pref_open_config_folder),
+  g_signal_connect(item, "activate", G_CALLBACK(tkui_pref_open_config_folder),
                    nullptr);
   gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
 
@@ -160,7 +160,8 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
 
   item = gtk_menu_item_new_with_label("Preferences");
-  g_signal_connect(item, "activate", G_CALLBACK(on_menu_preferences), nullptr);
+  g_signal_connect(item, "activate", G_CALLBACK(tkui_menu_preferences),
+                   nullptr);
   gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
 
   gtk_widget_show_all(g_tweaks_menu);
@@ -170,7 +171,7 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
 
   // Set keyboard shortcuts
   gKeyGroup = plugin_set_key_group(geany_plugin, "Tweaks-UI", TWEAKS_KEY_COUNT,
-                                   (GeanyKeyGroupCallback)on_key_binding);
+                                   (GeanyKeyGroupCallback)tkui_key_binding);
 
   keybindings_set_item(
       gKeyGroup, TWEAKS_KEY_SWITCH_FOCUS_EDITOR_SIDEBAR_MSGWIN, nullptr, 0,
@@ -194,14 +195,21 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
                        GdkModifierType(0), "tweaks_ui_paste_2",
                        _("Edit/Paste (2)"), nullptr);
 
+  // initialize hide menubar
+  settings.hide_menubar.set_menubar_widget(geany_menubar);
+  settings.hide_menubar.set_keybinding(gKeyGroup,
+                                       TWEAKS_KEY_TOGGLE_VISIBILITY_MENUBAR);
+
+  // ported from Addons plugin
+  gMarkWord = ao_mark_word_new(settings.markword_enable,
+                               settings.markword_deselect_single_click);
+  gColorTip = ao_color_tip_new(settings.colortip_enable,
+                               settings.colortip_chooser_double_click);
+
   if (g_handle_reload_config == 0) {
     g_handle_reload_config = 1;
     g_idle_add(reload_config, nullptr);
   }
-
-  // individual features
-  g_markword = ao_mark_word_new(true, true);
-  g_colortip = ao_color_tip_new(true, false);
 
   return true;
 }
@@ -211,10 +219,10 @@ void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
 
   // pane_position_update(false);
 
-  g_object_unref(g_markword);
-  g_object_unref(g_colortip);
+  g_object_unref(gMarkWord);
+  g_object_unref(gColorTip);
 
-  settings.save();
+  settings.save_session();
 }
 
 GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
@@ -226,7 +234,7 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
 
   tooltip = g_strdup("Save the active settings to the config file.");
   btn = gtk_button_new_with_label("Save Config");
-  g_signal_connect(btn, "clicked", G_CALLBACK(on_pref_save_config), dialog);
+  g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_save_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
@@ -235,7 +243,7 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
       "Reload settings from the config file.  May be used "
       "to apply preferences after editing without restarting Geany.");
   btn = gtk_button_new_with_label("Reload Config");
-  g_signal_connect(btn, "clicked", G_CALLBACK(on_pref_reload_config), dialog);
+  g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_reload_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
@@ -244,14 +252,14 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
       "Delete the current config file and restore the default "
       "file with explanatory comments.");
   btn = gtk_button_new_with_label("Reset Config");
-  g_signal_connect(btn, "clicked", G_CALLBACK(on_pref_reset_config), dialog);
+  g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_reset_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
 
   tooltip = g_strdup("Open the config file in Geany for editing.");
   btn = gtk_button_new_with_label("Edit Config");
-  g_signal_connect(btn, "clicked", G_CALLBACK(on_pref_edit_config), dialog);
+  g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_edit_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
@@ -260,7 +268,7 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
       "Open the config folder in the default file manager.  The config folder "
       "contains the stylesheets, which may be edited.");
   btn = gtk_button_new_with_label("Open Config Folder");
-  g_signal_connect(btn, "clicked", G_CALLBACK(on_pref_open_config_folder),
+  g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_open_config_folder),
                    dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
@@ -270,16 +278,17 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
 }
 
 PluginCallback tkui_plugin_callbacks[] = {
-    {"document-activate", (GCallback)&on_document_activate, true, nullptr},
-    {"document-close", (GCallback)&on_document_close, true, nullptr},
-    {"document-new", (GCallback)&on_document_new, true, nullptr},
-    {"document-open", (GCallback)&on_document_open, true, nullptr},
-    {"document-reload", (GCallback)&on_document_reload, true, nullptr},
-    {"editor-notify", (GCallback)&on_editor_notify, true, nullptr},
-    {"geany-startup-complete", (GCallback)&on_startup_complete, true, nullptr},
-    {"project-close", (GCallback)&on_project_signal, true, nullptr},
-    {"project-open", (GCallback)&on_project_signal, true, nullptr},
-    {"project-save", (GCallback)&on_project_signal, true, nullptr},
+    {"document-activate", (GCallback)&tkui_signal_document_activate, true, nullptr},
+    {"document-close", (GCallback)&tkui_signal_document_close, true, nullptr},
+    {"document-new", (GCallback)&tkui_signal_document_new, true, nullptr},
+    {"document-open", (GCallback)&tkui_signal_document_open, true, nullptr},
+    {"document-reload", (GCallback)&tkui_signal_document_reload, true, nullptr},
+    {"editor-notify", (GCallback)&tkui_signal_editor_notify, true, nullptr},
+    {"geany-startup-complete", (GCallback)&tkui_signal_startup_complete, true,
+     nullptr},
+    {"project-close", (GCallback)&tkui_signal_project_signal, true, nullptr},
+    {"project-open", (GCallback)&tkui_signal_project_signal, true, nullptr},
+    {"project-save", (GCallback)&tkui_signal_project_signal, true, nullptr},
     {nullptr, nullptr, false, nullptr}};
 }  // namespace
 
@@ -312,40 +321,38 @@ void geany_load_module(GeanyPlugin *plugin) {
 gboolean reload_config(gpointer user_data) {
   settings.load();
 
-  if (settings.menubar_hide_on_start) {
-    hide_menubar();
-  } else if (settings.menubar_restore_state &&
-             !settings.menubar_previous_state) {
-    hide_menubar();
-  } else {
-    gtk_widget_show(geany_menubar);
-  }
 
   // pane_position_update(settings.sidebar_save_size_enabled ||
   //                      settings.sidebar_auto_size_enabled);
 
+  settings.hide_menubar.startup();
   settings.column_markers.show_idle();
+
+  ao_mark_word_set(gMarkWord, settings.markword_enable,
+                   settings.markword_deselect_single_click);
+  ao_color_tip_set(gColorTip, settings.colortip_enable,
+                   settings.colortip_chooser_double_click);
 
   g_handle_reload_config = 0;
   return FALSE;
 }
 
-void on_pref_reload_config(GtkWidget *self, GtkWidget *dialog) {
+void tkui_pref_reload_config(GtkWidget *self, GtkWidget *dialog) {
   if (g_handle_reload_config == 0) {
     g_handle_reload_config = 1;
     g_idle_add(reload_config, nullptr);
   }
 }
 
-void on_pref_save_config(GtkWidget *self, GtkWidget *dialog) {
+void tkui_pref_save_config(GtkWidget *self, GtkWidget *dialog) {
   settings.save();
 }
 
-void on_pref_reset_config(GtkWidget *self, GtkWidget *dialog) {
+void tkui_pref_reset_config(GtkWidget *self, GtkWidget *dialog) {
   settings.reset();
 }
 
-void on_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
+void tkui_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
   std::string conf_dn = cstr_assign(
       g_build_filename(geany_data->app->configdir, "plugins", nullptr));
 
@@ -353,7 +360,7 @@ void on_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
   (void)!system(command.c_str());
 }
 
-void on_pref_edit_config(GtkWidget *self, GtkWidget *dialog) {
+void tkui_pref_edit_config(GtkWidget *self, GtkWidget *dialog) {
   const std::string &filename = settings.get_config_file();
   if (filename.empty()) {
     return;
@@ -368,7 +375,7 @@ void on_pref_edit_config(GtkWidget *self, GtkWidget *dialog) {
   }
 }
 
-void on_menu_preferences(GtkWidget *self, GtkWidget *dialog) {
+void tkui_menu_preferences(GtkWidget *self, GtkWidget *dialog) {
   plugin_show_configure(geany_plugin);
 }
 
@@ -380,7 +387,7 @@ void on_menu_preferences(GtkWidget *self, GtkWidget *dialog) {
 void pane_position_update(gboolean enable) {
   if (enable && !g_handle_pane_position) {
     g_handle_pane_position = g_signal_connect(
-        GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(on_draw_pane), nullptr);
+        GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(tkui_draw_pane), nullptr);
   }
 
   if (!enable && g_handle_pane_position) {
@@ -389,7 +396,7 @@ void pane_position_update(gboolean enable) {
 }
 */
 /*
-gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data) {
+gboolean tkui_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data) {
   if (!settings.sidebar_save_size_enabled &&
       !settings.sidebar_auto_size_enabled) {
     //pane_position_update(false);
@@ -466,7 +473,7 @@ gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data) {
  * Keybinding Functions and Callbacks
  */
 
-void on_switch_focus_editor_sidebar_msgwin() {
+void tkui_switch_focus_editor_sidebar_msgwin() {
   GeanyDocument *doc = document_get_current();
   if (doc != nullptr) {
     gint cur_page = gtk_notebook_get_current_page(geany_sidebar);
@@ -489,39 +496,13 @@ void on_switch_focus_editor_sidebar_msgwin() {
   }
 }
 
-bool hide_menubar() {
-  if (gtk_widget_is_visible(geany_menubar)) {
-    GeanyKeyBinding *kb =
-        keybindings_get_item(gKeyGroup, TWEAKS_KEY_TOGGLE_VISIBILITY_MENUBAR);
-    if (kb->key != 0) {
-      gtk_widget_hide(geany_menubar);
-      gchar *val = gtk_accelerator_name(kb->key, kb->mods);
-      msgwin_status_add(_("Menubar has been hidden.  To reshow it, use: %s"),
-                        val);
-      g_free(val);
-      return true;
-    } else {
-      msgwin_status_add(
-          _("Menubar will not be hidden until after a keybinding to reshow "
-            " it has been set."));
-      return false;
-    }
-  }
-  return false;
-}
-void on_toggle_visibility_menubar() {
-  if (!hide_menubar()) {
-    gtk_widget_show(geany_menubar);
-  }
-}
-
-bool on_key_binding(int key_id) {
+bool tkui_key_binding(int key_id) {
   switch (key_id) {
     case TWEAKS_KEY_SWITCH_FOCUS_EDITOR_SIDEBAR_MSGWIN:
-      on_switch_focus_editor_sidebar_msgwin();
+      tkui_switch_focus_editor_sidebar_msgwin();
       break;
     case TWEAKS_KEY_TOGGLE_VISIBILITY_MENUBAR:
-      on_toggle_visibility_menubar();
+      settings.hide_menubar.toggle_idle();
       break;
     case TWEAKS_KEY_COPY:
       keybindings_send_command(GEANY_KEY_GROUP_CLIPBOARD,

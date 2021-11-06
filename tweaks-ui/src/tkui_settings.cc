@@ -1,10 +1,10 @@
 /*
- * Tweaks-UI Plugin for Geany
+ * Settings - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
- * This program is free software; you can redistgribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,9 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "auxiliary.h"
@@ -26,8 +24,6 @@
 TweakUISettings::~TweakUISettings() { close(); }
 
 void TweakUISettings::open() {
-  keyfile = g_key_file_new();
-
   config_file =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
@@ -38,6 +34,8 @@ void TweakUISettings::open() {
   if (!g_file_test(config_file.c_str(), G_FILE_TEST_EXISTS)) {
     reset();
   }
+
+  keyfile = g_key_file_new();
 }
 
 void TweakUISettings::close() {
@@ -80,20 +78,27 @@ void TweakUISettings::save() {
 
   kf_set_boolean("sidebar_save_size_enabled", sidebar_save_size_enabled);
   kf_set_boolean("sidebar_save_size_update", sidebar_save_size_update);
-  kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
-  kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
+  if (sidebar_save_size_update) {
+    kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
+    kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
+  }
 
   kf_set_boolean("sidebar_auto_size_enabled", sidebar_auto_size_enabled);
   kf_set_integer("sidebar_auto_size_normal", sidebar_auto_size_normal);
   kf_set_integer("sidebar_auto_size_maximized", sidebar_auto_size_maximized);
 
-  kf_set_boolean("menubar_hide_on_start", menubar_hide_on_start);
-  kf_set_boolean("menubar_restore_state", menubar_restore_state);
+  kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
+  kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
+  if (hide_menubar.restore_state) {
+    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
+  }
 
-  GtkWidget *geany_menubar =
-      ui_lookup_widget(GTK_WIDGET(geany->main_widgets->window), "hbox_menubar");
-  menubar_previous_state = gtk_widget_is_visible(geany_menubar);
-  kf_set_boolean("menubar_previous_state", menubar_previous_state);
+  kf_set_boolean("markword_enable", markword_enable);
+  kf_set_boolean("markword_deselect_single_click",
+                 markword_deselect_single_click);
+  kf_set_boolean("colortip_enable", colortip_enable);
+  kf_set_boolean("colortip_chooser_double_click",
+                 colortip_chooser_double_click);
 
   kf_set_boolean("column_marker_enable", column_markers.enable);
 
@@ -113,8 +118,36 @@ void TweakUISettings::save() {
   }
 }
 
+void TweakUISettings::save_session() {
+  if (!keyfile) {
+    return;
+  }
+
+  // Load old contents in case user changed file outside of GUI
+  g_key_file_load_from_file(
+      keyfile, config_file.c_str(),
+      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+      nullptr);
+
+  if (sidebar_save_size_update) {
+    kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
+    kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
+  }
+
+  if (hide_menubar.restore_state) {
+    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
+  }
+
+  // Store back on disk
+  std::string contents =
+      cstr_assign(g_key_file_to_data(keyfile, nullptr, nullptr));
+  if (!contents.empty()) {
+    file_set_contents(config_file, contents);
+  }
+}
+
 void TweakUISettings::load() {
-  if (!keyfile || !g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
+  if (!keyfile) {
     return;
   }
 
@@ -122,6 +155,10 @@ void TweakUISettings::load() {
       keyfile, config_file.c_str(),
       GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
       nullptr);
+
+  if (!g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
+    return;
+  }
 
   sidebar_save_size_enabled = kf_get_boolean("sidebar_save_size_enabled", true);
   sidebar_save_size_update = kf_get_boolean("sidebar_save_size_update", true);
@@ -135,13 +172,20 @@ void TweakUISettings::load() {
   sidebar_auto_size_maximized =
       kf_get_integer("sidebar_auto_size_maximized", 100, 0);
 
-  menubar_hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
-  menubar_restore_state = kf_get_boolean("menubar_restore_state", false);
-  menubar_previous_state = kf_get_boolean("menubar_previous_state", true);
+  hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
+  hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
+  hide_menubar.previous_state = kf_get_boolean("menubar_previous_state", true);
 
-  column_markers.enable = kf_get_boolean("column_markers.enable", true);
+  markword_enable = kf_get_boolean("markword_enable", false);
+  markword_deselect_single_click =
+      kf_get_boolean("markword_deselect_single_click", false);
+  colortip_enable = kf_get_boolean("colortip_enable", false);
+  colortip_chooser_double_click =
+      kf_get_boolean("colortip_chooser_double_click", false);
 
   {
+    column_markers.enable = kf_get_boolean("column_marker_enable", false);
+
     std::string str_columns;
     std::string str_colors;
 

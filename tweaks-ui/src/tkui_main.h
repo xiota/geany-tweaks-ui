@@ -2,9 +2,9 @@
  * Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,9 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -40,23 +38,23 @@ enum TweakShortcuts {
 
 // Pane Position Callbacks
 // void pane_position_update(gboolean enable);
-// gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
+// gboolean tkui_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
 
 // Preferences Callbacks
 gboolean reload_config(gpointer user_data);
-void on_pref_reload_config(GtkWidget *self = nullptr,
+void tkui_pref_reload_config(GtkWidget *self = nullptr,
                            GtkWidget *dialog = nullptr);
-void on_pref_save_config(GtkWidget *self, GtkWidget *dialog);
-void on_pref_reset_config(GtkWidget *self, GtkWidget *dialog);
-void on_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog);
-void on_pref_edit_config(GtkWidget *self, GtkWidget *dialog);
-void on_menu_preferences(GtkWidget *self, GtkWidget *dialog);
+void tkui_pref_save_config(GtkWidget *self, GtkWidget *dialog);
+void tkui_pref_reset_config(GtkWidget *self, GtkWidget *dialog);
+void tkui_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog);
+void tkui_pref_edit_config(GtkWidget *self, GtkWidget *dialog);
+void tkui_menu_preferences(GtkWidget *self, GtkWidget *dialog);
 
 // Keybinding Functions and Callbacks
-void on_switch_focus_editor_sidebar_msgwin();
+void tkui_switch_focus_editor_sidebar_msgwin();
 bool hide_menubar();
-void on_toggle_visibility_menubar();
-bool on_key_binding(int key_id);
+void tkui_toggle_visibility_menubar();
+bool tkui_key_binding(int key_id);
 
 // Other functions
 gboolean show_column_markers(gpointer user_data = nullptr);

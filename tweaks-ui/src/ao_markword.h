@@ -26,6 +26,9 @@
 
 #include "tkui_addon.h"
 
+extern GeanyPlugin *geany_plugin;
+extern GeanyData *geany_data;
+
 G_BEGIN_DECLS
 
 #define AO_MARKWORD_TYPE (ao_mark_word_get_type())
@@ -43,6 +46,9 @@ typedef struct _AoMarkWordClass AoMarkWordClass;
 
 GType ao_mark_word_get_type(void);
 AoMarkWord *ao_mark_word_new(gboolean enable, gboolean single_click_deselect);
+void ao_mark_word_set(AoMarkWord *self, gboolean enable,
+                      gboolean single_click_deselect);
+
 void ao_mark_document_new(AoMarkWord *mw, GeanyDocument *document);
 void ao_mark_document_open(AoMarkWord *mw, GeanyDocument *document);
 void ao_mark_document_close(AoMarkWord *mw, GeanyDocument *document);

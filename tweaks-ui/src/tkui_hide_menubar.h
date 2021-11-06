@@ -1,5 +1,5 @@
 /*
- * Addons - Tweaks-UI Plugin for Geany
+ * Hide Menubar - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,31 @@
 
 #pragma once
 
-#include <geanyplugin.h>
+#include "tkui_addon.h"
 
-extern GeanyPlugin *geany_plugin;
-extern GeanyData *geany_data;
+class tkuiHideMenubar {
+ public:
+  void initialize();
+  bool hide();
+  void show();
+  void startup();
+  void toggle();
+  void toggle_idle();
+  bool get_state();
+
+  void set_keybinding(GeanyKeyGroup *group, gsize key_id);
+  void set_menubar_widget(GtkWidget *widget);
+
+ public:
+  bool hide_on_start = false;
+  bool restore_state = false;
+  bool previous_state = true;
+
+ private:
+  static gboolean toggle_idle_callback(gpointer user_data);
+
+ private:
+  GtkWidget *geany_menubar = nullptr;
+  GeanyKeyBinding *keybinding = nullptr;
+  bool bToggleIdleInProgress = false;
+};

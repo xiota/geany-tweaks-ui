@@ -210,3 +210,9 @@ AoMarkWord *ao_mark_word_new(gboolean enable, gboolean single_click_deselect) {
                       "enable-single-click-deselect", single_click_deselect,
                       NULL);
 }
+
+void ao_mark_word_set(AoMarkWord *self, gboolean enable,
+                      gboolean single_click_deselect) {
+  g_object_set(self, "enable-markword", enable, "enable-single-click-deselect",
+               single_click_deselect, NULL);
+}

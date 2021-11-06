@@ -24,6 +24,9 @@
 
 #include "tkui_addon.h"
 
+extern GeanyPlugin *geany_plugin;
+extern GeanyData *geany_data;
+
 G_BEGIN_DECLS
 
 #define AO_COLORTIP_TYPE (ao_color_tip_get_type())
@@ -42,6 +45,9 @@ typedef struct _AoColorTipClass AoColorTipClass;
 GType ao_color_tip_get_type(void);
 AoColorTip *ao_color_tip_new(gboolean enable_tip,
                              gboolean double_click_color_chooser);
+void ao_color_tip_set(AoColorTip *self, gboolean enable_tip,
+                      gboolean double_click_color_chooser);
+
 void ao_color_tip_document_new(AoColorTip *colortip, GeanyDocument *document);
 void ao_color_tip_document_open(AoColorTip *colortip, GeanyDocument *document);
 void ao_color_tip_document_close(AoColorTip *colortip, GeanyDocument *document);
