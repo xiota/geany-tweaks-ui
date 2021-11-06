@@ -18,6 +18,7 @@
  * MA 02110-1301, USA.
  */
 
+#include "auxiliary.h"
 #include "tkui_column_markers.h"
 
 gboolean tkuiColumnMarkers::show_idle_callback(gpointer user_data) {
@@ -147,6 +148,8 @@ void tkuiColumnMarkers::add_column(std::string strColumn,
 
 void tkuiColumnMarkers::set_columns(std::string strColumns,
                                     std::string strColors) {
+  clear_columns();
+
   auto vs_columns = split_string(strColumns, ";");
   auto vs_colors = split_string(strColors, ";");
 

@@ -23,8 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "auxiliary.h"
-#include "plugin.h"
+#include "tkui_addon.h"
 
 class tkuiColumnMarkers {
  public:

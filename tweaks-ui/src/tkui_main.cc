@@ -27,8 +27,8 @@
 #include "ao_colortip.h"
 #include "ao_markword.h"
 #include "auxiliary.h"
-#include "plugin.h"
-#include "prefs.h"
+#include "tkui_settings.h"
+#include "tkui_main.h"
 
 /* ********************
  * Globals
@@ -54,6 +54,8 @@ AoMarkWord *g_markword = nullptr;
 AoColorTip *g_colortip = nullptr;
 
 GeanyKeyGroup *gKeyGroup = nullptr;
+
+TweakUISettings settings;
 
 /* ********************
  * Geany Signal Callbacks
@@ -116,7 +118,7 @@ void on_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
  * Plugin Functions
  */
 
-gboolean tweaks_init(GeanyPlugin *plugin, gpointer data) {
+gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   geany_plugin = plugin;
   geany_data = plugin->geany_data;
 
@@ -203,10 +205,10 @@ gboolean tweaks_init(GeanyPlugin *plugin, gpointer data) {
   return true;
 }
 
-void tweaks_cleanup(GeanyPlugin *plugin, gpointer data) {
+void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
   gtk_widget_destroy(g_tweaks_menu);
 
-  pane_position_update(false);
+  // pane_position_update(false);
 
   g_object_unref(g_markword);
   g_object_unref(g_colortip);
@@ -214,7 +216,7 @@ void tweaks_cleanup(GeanyPlugin *plugin, gpointer data) {
   settings.save();
 }
 
-GtkWidget *tweaks_configure(GeanyPlugin *plugin, GtkDialog *dialog,
+GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
                             gpointer pdata) {
   GtkWidget *box, *btn;
   char *tooltip;
@@ -266,7 +268,7 @@ GtkWidget *tweaks_configure(GeanyPlugin *plugin, GtkDialog *dialog,
   return box;
 }
 
-PluginCallback tweaks_callbacks[] = {
+PluginCallback tkui_plugin_callbacks[] = {
     {"document-activate", (GCallback)&on_document_activate, true, nullptr},
     {"document-close", (GCallback)&on_document_close, true, nullptr},
     {"document-new", (GCallback)&on_document_new, true, nullptr},
@@ -292,11 +294,11 @@ void geany_load_module(GeanyPlugin *plugin) {
   plugin->info->author = "xiota";
 
   // plugin functions
-  plugin->funcs->init = tweaks_init;
-  plugin->funcs->cleanup = tweaks_cleanup;
+  plugin->funcs->init = tkui_plugin_init;
+  plugin->funcs->cleanup = tkui_plugin_cleanup;
   plugin->funcs->help = nullptr;
-  plugin->funcs->configure = tweaks_configure;
-  plugin->funcs->callbacks = tweaks_callbacks;
+  plugin->funcs->configure = tkui_plugin_configure;
+  plugin->funcs->callbacks = tkui_plugin_callbacks;
 
   // register
   GEANY_PLUGIN_REGISTER(plugin, 226);
@@ -318,8 +320,8 @@ gboolean reload_config(gpointer user_data) {
     gtk_widget_show(geany_menubar);
   }
 
-  pane_position_update(settings.sidebar_save_size_enabled ||
-                       settings.sidebar_auto_size_enabled);
+  // pane_position_update(settings.sidebar_save_size_enabled ||
+  //                      settings.sidebar_auto_size_enabled);
 
   settings.column_markers.show_idle();
 
@@ -372,6 +374,7 @@ void on_menu_preferences(GtkWidget *self, GtkWidget *dialog) {
  * Pane Position Callbacks
  */
 
+/*
 void pane_position_update(gboolean enable) {
   if (enable && !g_handle_pane_position) {
     g_handle_pane_position = g_signal_connect(
@@ -382,11 +385,12 @@ void pane_position_update(gboolean enable) {
     g_clear_signal_handler(&g_handle_pane_position, GTK_WIDGET(geany_hpane));
   }
 }
-
+*/
+/*
 gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data) {
   if (!settings.sidebar_save_size_enabled &&
       !settings.sidebar_auto_size_enabled) {
-    pane_position_update(false);
+    //pane_position_update(false);
     return false;
   }
 
@@ -454,6 +458,7 @@ gboolean on_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data) {
 
   return false;
 }
+*/
 
 /* ********************
  * Keybinding Functions and Callbacks
@@ -464,20 +469,20 @@ void on_switch_focus_editor_sidebar_msgwin() {
   if (doc != nullptr) {
     gint cur_page = gtk_notebook_get_current_page(geany_sidebar);
     GtkWidget *page = gtk_notebook_get_nth_page(geany_sidebar, cur_page);
-    page = find_focus_widget(page);
+    //page = find_focus_widget(page);
 
     if (gtk_widget_has_focus(GTK_WIDGET(doc->editor->sci)) &&
         gtk_widget_is_visible(GTK_WIDGET(geany_sidebar))) {
-      keybindings_send_command(GEANY_KEY_GROUP_FOCUS, GEANY_KEYS_FOCUS_SIDEBAR);
       g_signal_emit_by_name(G_OBJECT(geany_sidebar), "grab-focus", nullptr);
+      keybindings_send_command(GEANY_KEY_GROUP_FOCUS, GEANY_KEYS_FOCUS_SIDEBAR);
     } else if (gtk_widget_has_focus(page) &&
                gtk_widget_is_visible(GTK_WIDGET(geany_msgwin))) {
+      g_signal_emit_by_name(G_OBJECT(geany_sidebar), "grab-notify", nullptr);
       keybindings_send_command(GEANY_KEY_GROUP_FOCUS,
                                GEANY_KEYS_FOCUS_MESSAGE_WINDOW);
-      g_signal_emit_by_name(G_OBJECT(geany_sidebar), "grab-notify", nullptr);
     } else {
-      keybindings_send_command(GEANY_KEY_GROUP_FOCUS, GEANY_KEYS_FOCUS_EDITOR);
       g_signal_emit_by_name(G_OBJECT(geany_sidebar), "grab-notify", nullptr);
+      keybindings_send_command(GEANY_KEY_GROUP_FOCUS, GEANY_KEYS_FOCUS_EDITOR);
     }
   }
 }
@@ -531,6 +536,7 @@ bool on_key_binding(int key_id) {
   return true;
 }
 
+/*
 GtkWidget *find_focus_widget(GtkWidget *widget) {
   GtkWidget *focus = nullptr;
 
@@ -546,14 +552,15 @@ GtkWidget *find_focus_widget(GtkWidget *widget) {
     g_list_free(children);
   }
 
-  /* Some containers handled above might not have children and be what we want
+  / * Some containers handled above might not have children and be what we want
    * to focus (e.g. GtkTreeView), so focus that if possible and we don't have
-   * anything better */
+   * anything better * /
   if (!focus && gtk_widget_get_can_focus(widget)) {
     focus = widget;
   }
   return focus;
 }
+*/
 
 /* ********************
  * Idle Callbacks

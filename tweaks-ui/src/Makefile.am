@@ -8,18 +8,18 @@ cf_data_DATA = \
 	../data/tweaks-ui.conf
 
 tweaks_ui_la_SOURCES = \
-	plugin.cc \
-	plugin.h \
+	tkui_main.cc \
+	tkui_main.h \
+	tkui_settings.cc \
+	tkui_settings.h \
+	tkui_column_markers.cc \
+	tkui_column_markers.h \
 	auxiliary.cc \
 	auxiliary.h \
-	prefs.cc \
-	prefs.h \
 	ao_colortip.c \
 	ao_colortip.h \
 	ao_markword.c \
-	ao_markword.h \
-	tkui_column_markers.cc \
-	tkui_column_markers.h
+	ao_markword.h
 
 tweaks_ui_la_CXXFLAGS = $(AM_CFLAGS) \
 	-DG_LOG_DOMAIN=\""Tweaks-UI"\" \

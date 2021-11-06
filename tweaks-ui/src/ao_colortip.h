@@ -24,9 +24,6 @@
 
 #include "tkui_addon.h"
 
-extern GeanyPlugin *geany_plugin;
-extern GeanyData *geany_data;
-
 G_BEGIN_DECLS
 
 #define AO_COLORTIP_TYPE (ao_color_tip_get_type())
