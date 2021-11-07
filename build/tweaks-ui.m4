@@ -4,6 +4,5 @@ AC_DEFUN([GP_CHECK_TWEAKS_UI],
     GP_COMMIT_PLUGIN_STATUS([Tweaks-UI])
     AC_CONFIG_FILES([
         tweaks-ui/Makefile
-        tweaks-ui/src/Makefile
     ])
 ])
