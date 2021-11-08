@@ -35,28 +35,6 @@ enum TweakUiShortcuts {
   TKUI_KEY_COUNT,
 };
 
-// Pane Position Callbacks
-// void pane_position_update(gboolean enable);
-// gboolean tkui_draw_pane(GtkWidget *self, cairo_t *cr, gpointer user_data);
-
-// Preferences Callbacks
-gboolean reload_config(gpointer user_data);
-void tkui_pref_reload_config(GtkWidget *self = nullptr,
-                             GtkWidget *dialog = nullptr);
-void tkui_pref_save_config(GtkWidget *self, GtkWidget *dialog);
-void tkui_pref_reset_config(GtkWidget *self, GtkWidget *dialog);
-void tkui_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog);
-void tkui_pref_edit_config(GtkWidget *self, GtkWidget *dialog);
-void tkui_menu_preferences(GtkWidget *self, GtkWidget *dialog);
-
-// Keybinding Functions and Callbacks
-void tkui_switch_focus_editor_sidebar_msgwin();
-bool hide_menubar();
-void tkui_toggle_visibility_menubar();
-bool tkui_key_binding(int key_id);
-
-// Other functions
-
 #define GFREE(_z_) \
   do {             \
     g_free(_z_);   \
