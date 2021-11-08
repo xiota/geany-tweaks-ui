@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include "tkui_auto_read_only.h"
 #include "tkui_column_markers.h"
 #include "tkui_hide_menubar.h"
 #include "tkui_main.h"
-#include "tkui_auto_read_only.h"
 #include "tkui_sidebar_auto_position.h"
 #include "tkui_sidebar_save_position.h"
 
@@ -66,6 +66,7 @@ class TweakUiSettings {
   std::string kf_get_string(std::string const &key, std::string const &def);
 
  private:
+  bool bSaveInProgress = false;
   GKeyFile *keyfile = nullptr;
   GKeyFile *session = nullptr;
   std::string config_file;
