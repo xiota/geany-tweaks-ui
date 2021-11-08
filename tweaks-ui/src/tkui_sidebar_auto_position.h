@@ -1,5 +1,5 @@
 /*
- * Sidebar Save Position - Tweaks-UI Plugin for Geany
+ * Sidebar Auto Position - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include "tkui_addon.h"
 
-class TweakUiSidebarSavePosition {
+class TweakUiSidebarAutoPosition {
  public:
   void initialize(GtkWidget *_geany_window);
   bool getEnabled() const;
@@ -29,10 +29,12 @@ class TweakUiSidebarSavePosition {
  public:
   int position_maximized = -1;
   int position_normal = -1;
-  bool position_update = true;
+  int columns_maximized = -1;
+  int columns_normal = -1;
 
  private:
   void update_connection();
+  void update_position();
   void update_hpane();
   static gboolean hpane_callback(GtkWidget *hpane, cairo_t *cr,
                                  gpointer user_data);

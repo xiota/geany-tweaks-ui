@@ -76,16 +76,13 @@ void TweakUiSettings::save() {
       GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
       nullptr);
 
-  {  // sidebar save position
-    kf_set_boolean("sidebar_save_size_enabled",
-                   sidebar_save_position.getEnabled());
-    kf_set_boolean("sidebar_save_size_update",
-                   sidebar_save_position.position_update);
-  }
+  kf_set_boolean("sidebar_save_size_enabled",
+                 sidebar_save_position.getEnabled());
+  kf_set_boolean("sidebar_save_size_update",
+                 sidebar_save_position.position_update);
 
-  kf_set_boolean("sidebar_auto_size_enabled", sidebar_auto_size_enabled);
-  kf_set_integer("sidebar_auto_size_normal", sidebar_auto_size_normal);
-  kf_set_integer("sidebar_auto_size_maximized", sidebar_auto_size_maximized);
+  kf_set_boolean("sidebar_auto_size_enabled",
+                 sidebar_auto_position.getEnabled());
 
   kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
   kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
@@ -128,6 +125,11 @@ void TweakUiSettings::save_session() {
                    sidebar_save_position.position_maximized);
   }
 
+  kf_set_integer("sidebar_auto_size_normal",
+                 sidebar_auto_position.columns_normal);
+  kf_set_integer("sidebar_auto_size_maximized",
+                 sidebar_auto_position.columns_maximized);
+
   if (hide_menubar.restore_state) {
     kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
   }
@@ -155,21 +157,30 @@ void TweakUiSettings::load() {
   }
 
   {  // sidebar save position
-    bool enabled = kf_get_boolean("sidebar_save_size_enabled", true);
+    bool enabled = kf_get_boolean("sidebar_save_size_enabled", false);
     sidebar_save_position.setEnabled(enabled);
     sidebar_save_position.position_update =
-        kf_get_boolean("sidebar_save_size_update", true);
+        kf_get_boolean("sidebar_save_size_update", false);
     sidebar_save_position.position_normal =
         kf_get_integer("sidebar_save_size_normal", 0, 0);
     sidebar_save_position.position_maximized =
         kf_get_integer("sidebar_save_size_maximized", 0, 0);
   }
 
-  sidebar_auto_size_enabled =
-      kf_get_boolean("sidebar_auto_size_enabled", false);
-  sidebar_auto_size_normal = kf_get_integer("sidebar_auto_size_normal", 76, 0);
-  sidebar_auto_size_maximized =
-      kf_get_integer("sidebar_auto_size_maximized", 100, 0);
+  {  // sidebar auto size
+    bool enabled = kf_get_boolean("sidebar_auto_size_enabled", false);
+    sidebar_auto_position.setEnabled(enabled);
+
+    sidebar_auto_position.columns_normal =
+        kf_get_integer("sidebar_auto_size_normal", 76, 0);
+    sidebar_auto_position.columns_maximized =
+        kf_get_integer("sidebar_auto_size_maximized", 100, 0);
+  }
+
+  // prevent auto size and save position from being enabled simultaneously
+  if (sidebar_auto_position.getEnabled()) {
+    sidebar_save_position.setEnabled(false);
+  }
 
   hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
   hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
