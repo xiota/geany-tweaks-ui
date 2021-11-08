@@ -26,14 +26,13 @@ extern GeanyData *geany_data;
 extern GtkWidget *find_focus_widget(GtkWidget *widget);
 extern GeanyKeyGroup *keybindings_get_core_group(guint id);
 
-enum TweakShortcuts {
-  TWEAKS_KEY_SWITCH_FOCUS_EDITOR_SIDEBAR_MSGWIN,
-  TWEAKS_KEY_TOGGLE_VISIBILITY_MENUBAR,
-  TWEAKS_KEY_COPY,
-  TWEAKS_KEY_PASTE_1,
-  TWEAKS_KEY_PASTE_2,
+enum TweakUiShortcuts {
+  TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY,
+  TKUI_KEY_COPY,
+  TKUI_KEY_PASTE_1,
+  TKUI_KEY_PASTE_2,
 
-  TWEAKS_KEY_COUNT,
+  TKUI_KEY_COUNT,
 };
 
 // Pane Position Callbacks
@@ -43,7 +42,7 @@ enum TweakShortcuts {
 // Preferences Callbacks
 gboolean reload_config(gpointer user_data);
 void tkui_pref_reload_config(GtkWidget *self = nullptr,
-                           GtkWidget *dialog = nullptr);
+                             GtkWidget *dialog = nullptr);
 void tkui_pref_save_config(GtkWidget *self, GtkWidget *dialog);
 void tkui_pref_reset_config(GtkWidget *self, GtkWidget *dialog);
 void tkui_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog);
@@ -57,28 +56,11 @@ void tkui_toggle_visibility_menubar();
 bool tkui_key_binding(int key_id);
 
 // Other functions
-gboolean show_column_markers(gpointer user_data = nullptr);
-
-#define GEANY_PSC(sig, cb)                                                  \
-  plugin_signal_connect(geany_plugin, nullptr, (sig), TRUE, G_CALLBACK(cb), \
-                        nullptr)
 
 #define GFREE(_z_) \
   do {             \
     g_free(_z_);   \
     _z_ = nullptr; \
-  } while (0)
-
-#define GSTRING_FREE(_z_)     \
-  do {                        \
-    g_string_free(_z_, TRUE); \
-    _z_ = nullptr;            \
-  } while (0)
-
-#define GERROR_FREE(_z_) \
-  do {                   \
-    g_error_free(_z_);   \
-    _z_ = nullptr;       \
   } while (0)
 
 #ifndef G_SOURCE_FUNC

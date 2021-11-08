@@ -21,7 +21,7 @@
 #include "auxiliary.h"
 #include "tkui_hide_menubar.h"
 
-bool tkuiHideMenubar::hide() {
+bool TweakUiHideMenubar::hide() {
   if (gtk_widget_is_visible(geany_menubar)) {
     if (keybinding && keybinding->key != 0) {
       gtk_widget_hide(geany_menubar);
@@ -40,9 +40,9 @@ bool tkuiHideMenubar::hide() {
   return false;
 }
 
-void tkuiHideMenubar::show() { gtk_widget_show(geany_menubar); }
+void TweakUiHideMenubar::show() { gtk_widget_show(geany_menubar); }
 
-void tkuiHideMenubar::startup() {
+void TweakUiHideMenubar::startup() {
   if (hide_on_start) {
     hide();
   } else if (restore_state && !previous_state) {
@@ -52,35 +52,35 @@ void tkuiHideMenubar::startup() {
   }
 }
 
-void tkuiHideMenubar::toggle() {
+void TweakUiHideMenubar::toggle() {
   if (!hide()) {
     show();
   }
 }
 
-bool tkuiHideMenubar::get_state() {
+bool TweakUiHideMenubar::get_state() {
   return gtk_widget_is_visible(geany_menubar);
 }
 
-gboolean tkuiHideMenubar::toggle_idle_callback(gpointer user_data) {
-  tkuiHideMenubar *self = (tkuiHideMenubar *)user_data;
+gboolean TweakUiHideMenubar::toggle_idle_callback(gpointer user_data) {
+  TweakUiHideMenubar *self = (TweakUiHideMenubar *)user_data;
 
   self->toggle();
   self->bToggleIdleInProgress = false;
   return false;
 }
 
-void tkuiHideMenubar::toggle_idle() {
+void TweakUiHideMenubar::toggle_idle() {
   if (!bToggleIdleInProgress) {
     bToggleIdleInProgress = true;
     g_idle_add(toggle_idle_callback, this);
   }
 }
 
-void tkuiHideMenubar::set_menubar_widget(GtkWidget *widget) {
+void TweakUiHideMenubar::set_menubar_widget(GtkWidget *widget) {
   geany_menubar = widget;
 }
 
-void tkuiHideMenubar::set_keybinding(GeanyKeyGroup *group, gsize key_id) {
+void TweakUiHideMenubar::set_keybinding(GeanyKeyGroup *group, gsize key_id) {
   keybinding = keybindings_get_item(group, key_id);
 }

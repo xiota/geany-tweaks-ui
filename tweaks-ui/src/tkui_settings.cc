@@ -21,9 +21,9 @@
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TweakUISettings::~TweakUISettings() { close(); }
+TweakUiSettings::~TweakUiSettings() { close(); }
 
-void TweakUISettings::open() {
+void TweakUiSettings::open() {
   config_file =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
@@ -38,14 +38,14 @@ void TweakUISettings::open() {
   keyfile = g_key_file_new();
 }
 
-void TweakUISettings::close() {
+void TweakUiSettings::close() {
   if (keyfile) {
     g_key_file_free(keyfile);
     keyfile = nullptr;
   }
 }
 
-void TweakUISettings::reset() {
+void TweakUiSettings::reset() {
   if (config_file.empty()) {
     open();
   }
@@ -65,7 +65,7 @@ void TweakUISettings::reset() {
   }
 }
 
-void TweakUISettings::save() {
+void TweakUiSettings::save() {
   if (!keyfile) {
     return;
   }
@@ -76,11 +76,11 @@ void TweakUISettings::save() {
       GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
       nullptr);
 
-  kf_set_boolean("sidebar_save_size_enabled", sidebar_save_size_enabled);
-  kf_set_boolean("sidebar_save_size_update", sidebar_save_size_update);
-  if (sidebar_save_size_update) {
-    kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
-    kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
+  {  // sidebar save position
+    kf_set_boolean("sidebar_save_size_enabled",
+                   sidebar_save_position.getEnabled());
+    kf_set_boolean("sidebar_save_size_update",
+                   sidebar_save_position.position_update);
   }
 
   kf_set_boolean("sidebar_auto_size_enabled", sidebar_auto_size_enabled);
@@ -89,9 +89,6 @@ void TweakUISettings::save() {
 
   kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
   kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
-  if (hide_menubar.restore_state) {
-    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
-  }
 
   kf_set_boolean("markword_enable", markword_enable);
   kf_set_boolean("markword_deselect_single_click",
@@ -110,15 +107,10 @@ void TweakUISettings::save() {
     kf_set_string("column_marker_colors", str_colors);
   }
 
-  // Store back on disk
-  std::string contents =
-      cstr_assign(g_key_file_to_data(keyfile, nullptr, nullptr));
-  if (!contents.empty()) {
-    file_set_contents(config_file, contents);
-  }
+  save_session();
 }
 
-void TweakUISettings::save_session() {
+void TweakUiSettings::save_session() {
   if (!keyfile) {
     return;
   }
@@ -129,9 +121,11 @@ void TweakUISettings::save_session() {
       GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
       nullptr);
 
-  if (sidebar_save_size_update) {
-    kf_set_integer("sidebar_save_size_normal", sidebar_save_size_normal);
-    kf_set_integer("sidebar_save_size_maximized", sidebar_save_size_maximized);
+  if (sidebar_save_position.position_update) {
+    kf_set_integer("sidebar_save_size_normal",
+                   sidebar_save_position.position_normal);
+    kf_set_integer("sidebar_save_size_maximized",
+                   sidebar_save_position.position_maximized);
   }
 
   if (hide_menubar.restore_state) {
@@ -146,7 +140,7 @@ void TweakUISettings::save_session() {
   }
 }
 
-void TweakUISettings::load() {
+void TweakUiSettings::load() {
   if (!keyfile) {
     return;
   }
@@ -160,11 +154,16 @@ void TweakUISettings::load() {
     return;
   }
 
-  sidebar_save_size_enabled = kf_get_boolean("sidebar_save_size_enabled", true);
-  sidebar_save_size_update = kf_get_boolean("sidebar_save_size_update", true);
-  sidebar_save_size_normal = kf_get_integer("sidebar_save_size_normal", 0, 0);
-  sidebar_save_size_maximized =
-      kf_get_integer("sidebar_save_size_maximized", 0, 0);
+  {  // sidebar save position
+    bool enabled = kf_get_boolean("sidebar_save_size_enabled", true);
+    sidebar_save_position.setEnabled(enabled);
+    sidebar_save_position.position_update =
+        kf_get_boolean("sidebar_save_size_update", true);
+    sidebar_save_position.position_normal =
+        kf_get_integer("sidebar_save_size_normal", 0, 0);
+    sidebar_save_position.position_maximized =
+        kf_get_integer("sidebar_save_size_maximized", 0, 0);
+  }
 
   sidebar_auto_size_enabled =
       kf_get_boolean("sidebar_auto_size_enabled", false);
@@ -201,15 +200,15 @@ void TweakUISettings::load() {
 // Keyfile operations
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-bool TweakUISettings::kf_has_key(std::string const &key) {
+bool TweakUiSettings::kf_has_key(std::string const &key) {
   return g_key_file_has_key(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
 }
 
-void TweakUISettings::kf_set_boolean(std::string const &key, bool const &val) {
+void TweakUiSettings::kf_set_boolean(std::string const &key, bool const &val) {
   g_key_file_set_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), val);
 }
 
-bool TweakUISettings::kf_get_boolean(std::string const &key, bool const &def) {
+bool TweakUiSettings::kf_get_boolean(std::string const &key, bool const &def) {
   if (kf_has_key(key)) {
     return g_key_file_get_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
   } else {
@@ -217,11 +216,11 @@ bool TweakUISettings::kf_get_boolean(std::string const &key, bool const &def) {
   }
 }
 
-void TweakUISettings::kf_set_integer(std::string const &key, int const &val) {
+void TweakUiSettings::kf_set_integer(std::string const &key, int const &val) {
   g_key_file_set_integer(keyfile, TKUI_KF_GROUP, key.c_str(), val);
 }
 
-int TweakUISettings::kf_get_integer(std::string const &key, int const &def,
+int TweakUiSettings::kf_get_integer(std::string const &key, int const &def,
                                     int const &min) {
   if (kf_has_key(key)) {
     int val =
@@ -237,12 +236,12 @@ int TweakUISettings::kf_get_integer(std::string const &key, int const &def,
   }
 }
 
-void TweakUISettings::kf_set_string(std::string const &key,
+void TweakUiSettings::kf_set_string(std::string const &key,
                                     std::string const &val) {
   g_key_file_set_string(keyfile, TKUI_KF_GROUP, key.c_str(), val.c_str());
 }
 
-std::string TweakUISettings::kf_get_string(std::string const &key,
+std::string TweakUiSettings::kf_get_string(std::string const &key,
                                            std::string const &def) {
   if (kf_has_key(key)) {
     char *val =

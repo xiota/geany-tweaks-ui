@@ -21,12 +21,13 @@
 #include "tkui_column_markers.h"
 #include "tkui_hide_menubar.h"
 #include "tkui_main.h"
+#include "tkui_sidebar_save_position.h"
 
 #define TKUI_KF_GROUP "tweaks"
 
-class TweakUISettings {
+class TweakUiSettings {
  public:
-  ~TweakUISettings();
+  ~TweakUiSettings();
 
   void open();
   void close();
@@ -39,11 +40,6 @@ class TweakUISettings {
   std::string get_session_file() const { return session_file; }
 
  public:
-  gboolean sidebar_save_size_enabled = true;
-  gboolean sidebar_save_size_update = true;
-  int sidebar_save_size_normal = 0;
-  int sidebar_save_size_maximized = 0;
-
   gboolean sidebar_auto_size_enabled = false;
   int sidebar_auto_size_normal = 76;
   int sidebar_auto_size_maximized = 100;
@@ -53,8 +49,14 @@ class TweakUISettings {
   bool colortip_enable = false;
   bool colortip_chooser_double_click = false;
 
-  tkuiColumnMarkers column_markers;
-  tkuiHideMenubar hide_menubar;
+  TweakUiColumnMarkers column_markers;
+  TweakUiHideMenubar hide_menubar;
+  TweakUiSidebarSavePosition sidebar_save_position;
+
+  gboolean sidebar_save_size_enabled = true;
+  gboolean sidebar_save_size_update = true;
+  int sidebar_save_size_normal = 0;
+  int sidebar_save_size_maximized = 0;
 
  private:
   bool kf_has_key(std::string const &key);

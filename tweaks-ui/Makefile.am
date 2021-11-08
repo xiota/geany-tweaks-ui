@@ -22,6 +22,8 @@ tweaks_ui_la_SOURCES = \
 	src/tkui_column_markers.h \
 	src/tkui_hide_menubar.cc \
 	src/tkui_hide_menubar.h \
+	src/tkui_sidebar_save_position.cc \
+	src/tkui_sidebar_save_position.h \
 	src/auxiliary.cc \
 	src/auxiliary.h \
 	src/ao_colortip.c \
