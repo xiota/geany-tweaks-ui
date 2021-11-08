@@ -119,13 +119,11 @@ void tkui_signal_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
 gboolean reload_config(gpointer user_data) {
   settings.load();
 
-  // pane_position_update(settings.sidebar_save_size_enabled ||
-  //                      settings.sidebar_auto_size_enabled);
-
   settings.hide_menubar.startup();
   settings.column_markers.show_idle();
 
   settings.sidebar_save_position.initialize(GTK_WIDGET(geany_window));
+  settings.sidebar_auto_position.initialize(GTK_WIDGET(geany_window));
 
   ao_mark_word_set(gMarkWord, settings.markword_enable,
                    settings.markword_deselect_single_click);

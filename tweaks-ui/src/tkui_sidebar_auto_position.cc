@@ -1,5 +1,5 @@
 /*
- * Sidebar Save Position - Tweaks-UI Plugin for Geany
+ * Sidebar Auto Position - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tkui_sidebar_save_position.h"
+#include <string>
 
-void TweakUiSidebarSavePosition::initialize(GtkWidget *_geany_window) {
+#include "tkui_sidebar_auto_position.h"
+
+void TweakUiSidebarAutoPosition::initialize(GtkWidget *_geany_window) {
   geany_window = _geany_window;
   if (geany_window) {
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
     update_connection();
   }
+
+  update_position();
 }
 
-bool TweakUiSidebarSavePosition::getEnabled() const { return enabled; }
+void TweakUiSidebarAutoPosition::update_position() {
+  GeanyDocument *doc = document_get_current();
+  if (DOC_VALID(doc)) {
+    std::string str_auto_maximized(columns_maximized, '0');
+    std::string str_auto_normal(columns_normal, '0');
 
-void TweakUiSidebarSavePosition::setEnabled(bool const val) {
+    int pos_origin = (int)scintilla_send_message(doc->editor->sci,
+                                                 SCI_POINTXFROMPOSITION, 0, 1);
+    int pos_maximized = (int)scintilla_send_message(
+        doc->editor->sci, SCI_TEXTWIDTH, 0, (gulong)str_auto_maximized.c_str());
+    int pos_normal = (int)scintilla_send_message(
+        doc->editor->sci, SCI_TEXTWIDTH, 0, (gulong)str_auto_normal.c_str());
+
+    position_maximized = pos_origin + pos_maximized;
+    position_normal = pos_origin + pos_normal;
+  }
+}
+
+bool TweakUiSidebarAutoPosition::getEnabled() const { return enabled; }
+
+void TweakUiSidebarAutoPosition::setEnabled(bool const val) {
   enabled = val;
   update_connection();
 }
 
-void TweakUiSidebarSavePosition::update_connection() {
+void TweakUiSidebarAutoPosition::update_connection() {
   if (enabled && !ulHandlePanePosition) {
     ulHandlePanePosition = g_signal_connect(GTK_WIDGET(geany_hpane), "draw",
                                             G_CALLBACK(hpane_callback), this);
@@ -44,10 +66,10 @@ void TweakUiSidebarSavePosition::update_connection() {
   }
 }
 
-gboolean TweakUiSidebarSavePosition::hpane_callback(GtkWidget *hpane,
+gboolean TweakUiSidebarAutoPosition::hpane_callback(GtkWidget *hpane,
                                                     cairo_t *cr,
                                                     gpointer user_data) {
-  TweakUiSidebarSavePosition *self = (TweakUiSidebarSavePosition *)user_data;
+  TweakUiSidebarAutoPosition *self = (TweakUiSidebarAutoPosition *)user_data;
   if (!self->enabled) {
     self->update_connection();
     return false;
@@ -57,11 +79,15 @@ gboolean TweakUiSidebarSavePosition::hpane_callback(GtkWidget *hpane,
   return false;
 }
 
-void TweakUiSidebarSavePosition::update_hpane() {
+void TweakUiSidebarAutoPosition::update_hpane() {
   if (!geany_hpane || !geany_window) {
     enabled = false;
     update_connection();
     return;
+  }
+
+  if (position_maximized < 0 || position_normal < 0) {
+    update_position();
   }
 
   GdkWindowState wstate =
@@ -71,16 +97,7 @@ void TweakUiSidebarSavePosition::update_hpane() {
   bool window_maximized_current =
       wstate & (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN);
 
-  if (window_maximized_current == window_maximized_previous) {
-    // save current sidebar divider position
-    if (position_update) {
-      if (window_maximized_current) {
-        position_maximized = gtk_paned_get_position(GTK_PANED(geany_hpane));
-      } else {
-        position_normal = gtk_paned_get_position(GTK_PANED(geany_hpane));
-      }
-    }
-  } else {
+  if (window_maximized_current != window_maximized_previous) {
     if (window_maximized_current) {
       if (position_maximized >= 0) {
         gtk_paned_set_position(GTK_PANED(geany_hpane), position_maximized);
