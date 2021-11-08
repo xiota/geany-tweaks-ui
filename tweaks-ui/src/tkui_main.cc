@@ -194,7 +194,7 @@ void tkui_menu_preferences(GtkWidget *self, GtkWidget *dialog) {
 bool tkui_key_binding(int key_id) {
   switch (key_id) {
     case TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY:
-      settings.hide_menubar.toggle_idle();
+      settings.hide_menubar.toggle();
       break;
     case TKUI_KEY_COPY:
       keybindings_send_command(GEANY_KEY_GROUP_CLIPBOARD,

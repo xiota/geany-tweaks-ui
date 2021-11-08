@@ -27,7 +27,6 @@ class TweakUiHideMenubar {
   void show();
   void startup();
   void toggle();
-  void toggle_idle();
   bool get_state();
 
   void set_keybinding(GeanyKeyGroup *group, gsize key_id);
@@ -39,10 +38,6 @@ class TweakUiHideMenubar {
   bool previous_state = true;
 
  private:
-  static gboolean toggle_idle_callback(gpointer user_data);
-
- private:
   GtkWidget *geany_menubar = nullptr;
   GeanyKeyBinding *keybinding = nullptr;
-  bool bToggleIdleInProgress = false;
 };

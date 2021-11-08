@@ -62,21 +62,6 @@ bool TweakUiHideMenubar::get_state() {
   return gtk_widget_is_visible(geany_menubar);
 }
 
-gboolean TweakUiHideMenubar::toggle_idle_callback(gpointer user_data) {
-  TweakUiHideMenubar *self = (TweakUiHideMenubar *)user_data;
-
-  self->toggle();
-  self->bToggleIdleInProgress = false;
-  return false;
-}
-
-void TweakUiHideMenubar::toggle_idle() {
-  if (!bToggleIdleInProgress) {
-    bToggleIdleInProgress = true;
-    g_idle_add(toggle_idle_callback, this);
-  }
-}
-
 void TweakUiHideMenubar::set_menubar_widget(GtkWidget *widget) {
   geany_menubar = widget;
 }
