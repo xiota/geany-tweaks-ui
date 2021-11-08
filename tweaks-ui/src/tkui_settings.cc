@@ -87,6 +87,8 @@ void TweakUiSettings::save() {
   kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
   kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
 
+  kf_set_boolean("auto_read_only", auto_read_only.enable);
+
   kf_set_boolean("markword_enable", markword_enable);
   kf_set_boolean("markword_deselect_single_click",
                  markword_deselect_single_click);
@@ -185,6 +187,8 @@ void TweakUiSettings::load() {
   hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
   hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
   hide_menubar.previous_state = kf_get_boolean("menubar_previous_state", true);
+
+  auto_read_only.enable = kf_get_boolean("auto_read_only", false);
 
   markword_enable = kf_get_boolean("markword_enable", false);
   markword_deselect_single_click =

@@ -22,3 +22,19 @@
 
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
+
+#if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 58
+#define G_SOURCE_FUNC(f) ((GSourceFunc)(void (*)(void))(f))
+#endif  // G_SOURCE_FUNC
+
+// g_clear_signal_handler was added in glib 2.62
+#if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 62
+#include "gobject/gsignal.h"
+#define g_clear_signal_handler(handler, instance)      \
+  do {                                                 \
+    if (handler != nullptr && *handler != 0) {         \
+      g_signal_handler_disconnect(instance, *handler); \
+      *handler = 0;                                    \
+    }                                                  \
+  } while (0)
+#endif  // g_clear_signal_handler

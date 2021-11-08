@@ -1,5 +1,5 @@
 /*
- * Tweaks-UI Plugin for Geany
+ * Sidebar Auto Position - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,26 +18,19 @@
 
 #pragma once
 
-#include <geanyplugin.h>
+#include "tkui_addon.h"
 
-extern GeanyPlugin *geany_plugin;
-extern GeanyData *geany_data;
+class TweakUiAutoReadOnly {
+ public:
+  void initialize(GtkWidget* mw);
+  void set_readonly();
+  void toggle();
+  void document_signal();
 
-extern GtkWidget *find_focus_widget(GtkWidget *widget);
-extern GeanyKeyGroup *keybindings_get_core_group(guint id);
+ public:
+  bool enable = false;
 
-enum TweakUiShortcuts {
-  TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY,
-  TKUI_KEY_COPY,
-  TKUI_KEY_PASTE_1,
-  TKUI_KEY_PASTE_2,
-  TKUI_KEY_TOGGLE_READONLY,
-
-  TKUI_KEY_COUNT,
+ private:
+  GtkWidget* main_window = nullptr;
+  GtkCheckMenuItem* readonly_menu_item = nullptr;
 };
-
-#define GFREE(_z_) \
-  do {             \
-    g_free(_z_);   \
-    _z_ = nullptr; \
-  } while (0)

@@ -68,7 +68,7 @@ void TweakUiColumnMarkers::show() {
 }
 
 void TweakUiColumnMarkers::get_columns(std::string &strColumns,
-                                    std::string &strColors) {
+                                       std::string &strColors) {
   std::vector<std::string> vs_columns;
   for (auto x : vn_columns) {
     vs_columns.push_back(std::to_string(x));
@@ -109,7 +109,7 @@ std::pair<std::string, std::string> TweakUiColumnMarkers::get_columns() {
 }
 
 void TweakUiColumnMarkers::add_column(std::string strColumn,
-                                   std::string strColor) {
+                                      std::string strColor) {
   char *ptr = nullptr;
   char strTmp[16];
   ulong color_val = 0;
@@ -147,7 +147,7 @@ void TweakUiColumnMarkers::add_column(std::string strColumn,
 }
 
 void TweakUiColumnMarkers::set_columns(std::string strColumns,
-                                    std::string strColors) {
+                                       std::string strColors) {
   clear_columns();
 
   auto vs_columns = split_string(strColumns, ";");
