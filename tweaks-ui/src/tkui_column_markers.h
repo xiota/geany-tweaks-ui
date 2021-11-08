@@ -23,9 +23,9 @@
 
 #include "tkui_addon.h"
 
-class tkuiColumnMarkers {
+class TweakUiColumnMarkers {
  public:
-  tkuiColumnMarkers() = default;
+  TweakUiColumnMarkers() = default;
 
   void show();
   void show_idle();
@@ -44,7 +44,7 @@ class tkuiColumnMarkers {
   static gboolean show_idle_callback(gpointer user_data);
 
  private:
-  bool gbHandleShowIdleInProgress = false;
+  bool bHandleShowIdleInProgress = false;
   std::vector<int> vn_columns;
   std::vector<int> vn_colors;
 };

@@ -1,5 +1,5 @@
 /*
- * Hide Menubar - Tweaks-UI Plugin for Geany
+ * Sidebar Save Position - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,29 +20,26 @@
 
 #include "tkui_addon.h"
 
-class TweakUiHideMenubar {
+class TweakUiSidebarSavePosition {
  public:
-  void initialize();
-  bool hide();
-  void show();
-  void startup();
-  void toggle();
-  void toggle_idle();
-  bool get_state();
-
-  void set_keybinding(GeanyKeyGroup *group, gsize key_id);
-  void set_menubar_widget(GtkWidget *widget);
+  void initialize(GtkWidget *_geany_window);
+  bool getEnabled() const;
+  void setEnabled(bool const val);
 
  public:
-  bool hide_on_start = false;
-  bool restore_state = false;
-  bool previous_state = true;
+  int position_maximized = -1;
+  int position_normal = -1;
+  bool position_update = true;
 
  private:
-  static gboolean toggle_idle_callback(gpointer user_data);
+  void update_connection();
+  void update();
+  static gboolean hpane_callback(GtkWidget *hpane, cairo_t *cr,
+                                 gpointer user_data);
 
  private:
-  GtkWidget *geany_menubar = nullptr;
-  GeanyKeyBinding *keybinding = nullptr;
-  bool bToggleIdleInProgress = false;
+  bool enabled = false;
+  gulong ulHandlePanePosition = false;
+  GtkWidget *geany_window = nullptr;
+  GtkWidget *geany_hpane = nullptr;
 };

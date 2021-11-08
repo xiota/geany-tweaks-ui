@@ -19,32 +19,32 @@
 #include "auxiliary.h"
 #include "tkui_column_markers.h"
 
-gboolean tkuiColumnMarkers::show_idle_callback(gpointer user_data) {
-  tkuiColumnMarkers *self = (tkuiColumnMarkers *)user_data;
+gboolean TweakUiColumnMarkers::show_idle_callback(gpointer user_data) {
+  TweakUiColumnMarkers *self = (TweakUiColumnMarkers *)user_data;
 
   self->show();
-  self->gbHandleShowIdleInProgress = false;
+  self->bHandleShowIdleInProgress = false;
   return false;
 }
 
-void tkuiColumnMarkers::show_idle() {
-  if (!gbHandleShowIdleInProgress) {
-    gbHandleShowIdleInProgress = true;
+void TweakUiColumnMarkers::show_idle() {
+  if (!bHandleShowIdleInProgress) {
+    bHandleShowIdleInProgress = true;
     g_idle_add(show_idle_callback, this);
   }
 }
 
-void tkuiColumnMarkers::clear_columns() {
+void TweakUiColumnMarkers::clear_columns() {
   vn_columns.clear();
   vn_colors.clear();
 }
 
-void tkuiColumnMarkers::add_column(int nColumn, int nColor) {
+void TweakUiColumnMarkers::add_column(int nColumn, int nColor) {
   vn_columns.push_back(nColumn);
   vn_colors.push_back(nColor);
 }
 
-void tkuiColumnMarkers::show() {
+void TweakUiColumnMarkers::show() {
   if (!enable) {
     return;
   }
@@ -67,7 +67,7 @@ void tkuiColumnMarkers::show() {
   }
 }
 
-void tkuiColumnMarkers::get_columns(std::string &strColumns,
+void TweakUiColumnMarkers::get_columns(std::string &strColumns,
                                     std::string &strColors) {
   std::vector<std::string> vs_columns;
   for (auto x : vn_columns) {
@@ -99,7 +99,7 @@ void tkuiColumnMarkers::get_columns(std::string &strColumns,
   }
 }
 
-std::pair<std::string, std::string> tkuiColumnMarkers::get_columns() {
+std::pair<std::string, std::string> TweakUiColumnMarkers::get_columns() {
   std::string strColumns;
   std::string strColors;
 
@@ -108,7 +108,7 @@ std::pair<std::string, std::string> tkuiColumnMarkers::get_columns() {
   return std::make_pair(strColumns, strColors);
 }
 
-void tkuiColumnMarkers::add_column(std::string strColumn,
+void TweakUiColumnMarkers::add_column(std::string strColumn,
                                    std::string strColor) {
   char *ptr = nullptr;
   char strTmp[16];
@@ -146,7 +146,7 @@ void tkuiColumnMarkers::add_column(std::string strColumn,
   add_column(column_val, color_val);
 }
 
-void tkuiColumnMarkers::set_columns(std::string strColumns,
+void TweakUiColumnMarkers::set_columns(std::string strColumns,
                                     std::string strColors) {
   clear_columns();
 
