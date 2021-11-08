@@ -70,6 +70,8 @@ void TweakUiSettings::save() {
     return;
   }
 
+  bSaveInProgress = true;
+
   // Load old contents in case user changed file outside of GUI
   g_key_file_load_from_file(
       keyfile, config_file.c_str(),
@@ -114,11 +116,13 @@ void TweakUiSettings::save_session() {
     return;
   }
 
-  // Load old contents in case user changed file outside of GUI
-  g_key_file_load_from_file(
-      keyfile, config_file.c_str(),
-      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
-      nullptr);
+  if (!bSaveInProgress) {
+    // Load old contents in case user changed file outside of GUI
+    g_key_file_load_from_file(
+        keyfile, config_file.c_str(),
+        GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+        nullptr);
+  }
 
   if (sidebar_save_position.position_update) {
     kf_set_integer("sidebar_save_size_normal",
@@ -142,6 +146,8 @@ void TweakUiSettings::save_session() {
   if (!contents.empty()) {
     file_set_contents(config_file, contents);
   }
+
+  bSaveInProgress = false;
 }
 
 void TweakUiSettings::load() {
