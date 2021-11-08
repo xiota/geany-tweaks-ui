@@ -21,6 +21,7 @@
 #include "tkui_column_markers.h"
 #include "tkui_hide_menubar.h"
 #include "tkui_main.h"
+#include "tkui_auto_read_only.h"
 #include "tkui_sidebar_auto_position.h"
 #include "tkui_sidebar_save_position.h"
 
@@ -50,6 +51,7 @@ class TweakUiSettings {
   TweakUiHideMenubar hide_menubar;
   TweakUiSidebarSavePosition sidebar_save_position;
   TweakUiSidebarAutoPosition sidebar_auto_position;
+  TweakUiAutoReadOnly auto_read_only;
 
  private:
   bool kf_has_key(std::string const &key);

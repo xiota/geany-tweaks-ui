@@ -70,6 +70,7 @@ void tkui_signal_document_activate(GObject *obj, GeanyDocument *doc,
                                    gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
+  settings.auto_read_only.document_signal();
   settings.column_markers.show_idle();
 }
 
@@ -89,6 +90,7 @@ void tkui_signal_document_open(GObject *obj, GeanyDocument *doc,
   ao_mark_document_open(gMarkWord, doc);
   ao_color_tip_document_open(gColorTip, doc);
 
+  settings.auto_read_only.document_signal();
   settings.column_markers.show_idle();
 }
 
@@ -104,6 +106,7 @@ void tkui_signal_document_reload(GObject *obj, GeanyDocument *doc,
                                  gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
+  settings.auto_read_only.document_signal();
   settings.column_markers.show_idle();
 }
 
@@ -131,6 +134,7 @@ gboolean reload_config(gpointer user_data) {
 
   settings.sidebar_save_position.initialize(GTK_WIDGET(geany_window));
   settings.sidebar_auto_position.initialize(GTK_WIDGET(geany_window));
+  settings.auto_read_only.initialize(GTK_WIDGET(geany_window));
 
   ao_mark_word_set(gMarkWord, settings.markword_enable,
                    settings.markword_deselect_single_click);
@@ -201,6 +205,9 @@ bool tkui_key_binding(int key_id) {
       keybindings_send_command(GEANY_KEY_GROUP_CLIPBOARD,
                                GEANY_KEYS_CLIPBOARD_PASTE);
       break;
+    case TKUI_KEY_TOGGLE_READONLY:
+      settings.auto_read_only.toggle();
+      break;
     default:
       return false;
   }
@@ -266,11 +273,6 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   gKeyGroup = plugin_set_key_group(geany_plugin, "Tweaks-UI", TKUI_KEY_COUNT,
                                    (GeanyKeyGroupCallback)tkui_key_binding);
 
-  keybindings_set_item(gKeyGroup, TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY, nullptr,
-                       0, GdkModifierType(0),
-                       "tweaks_ui_toggle_visibility_menubar_",
-                       _("Toggle visibility of the menubar."), nullptr);
-
   keybindings_set_item(gKeyGroup, TKUI_KEY_COPY, nullptr, 0, GdkModifierType(0),
                        "tweaks_ui_copy", _("Edit/Copy"), nullptr);
 
@@ -281,6 +283,15 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   keybindings_set_item(gKeyGroup, TKUI_KEY_PASTE_2, nullptr, 0,
                        GdkModifierType(0), "tweaks_ui_paste_2",
                        _("Edit/Paste (2)"), nullptr);
+
+  keybindings_set_item(gKeyGroup, TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY, nullptr,
+                       0, GdkModifierType(0),
+                       "tweaks_ui_toggle_visibility_menubar_",
+                       _("Toggle visibility of the menubar."), nullptr);
+
+  keybindings_set_item(gKeyGroup, TKUI_KEY_TOGGLE_READONLY, nullptr, 0,
+                       GdkModifierType(0), "tweaks_ui_toggle_readonly",
+                       _("Toggle document read-only state"), nullptr);
 
   // initialize hide menubar
   settings.hide_menubar.set_menubar_widget(geany_menubar);

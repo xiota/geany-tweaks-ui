@@ -26,6 +26,8 @@ tweaks_ui_la_SOURCES = \
 	src/tkui_sidebar_save_position.h \
 	src/tkui_sidebar_auto_position.cc \
 	src/tkui_sidebar_auto_position.h \
+	src/tkui_auto_read_only.cc \
+	src/tkui_auto_read_only.h \
 	src/auxiliary.cc \
 	src/auxiliary.h \
 	src/ao_colortip.c \
