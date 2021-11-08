@@ -34,7 +34,7 @@
 GeanyPlugin *geany_plugin;
 GeanyData *geany_data;
 
-namespace {
+namespace {  // global variable
 
 GtkWindow *geany_window = nullptr;
 GtkNotebook *geany_sidebar = nullptr;
@@ -44,8 +44,6 @@ GtkWidget *geany_menubar = nullptr;
 
 GtkWidget *g_tweaks_menu = nullptr;
 
-gulong g_handle_reload_config = 0;
-
 AoMarkWord *gMarkWord = nullptr;
 AoColorTip *gColorTip = nullptr;
 
@@ -53,6 +51,9 @@ GeanyKeyGroup *gKeyGroup = nullptr;
 
 TweakUiSettings settings;
 
+}  // namespace
+
+namespace {
 /* ********************
  * Geany Signal Callbacks
  */
@@ -116,6 +117,12 @@ void tkui_signal_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
   settings.column_markers.show_idle();
 }
 
+}  // namespace
+
+namespace {
+
+bool g_handle_reload_config = false;
+
 gboolean reload_config(gpointer user_data) {
   settings.load();
 
@@ -135,8 +142,8 @@ gboolean reload_config(gpointer user_data) {
 }
 
 void tkui_pref_reload_config(GtkWidget *self, GtkWidget *dialog) {
-  if (g_handle_reload_config == 0) {
-    g_handle_reload_config = 1;
+  if (!g_handle_reload_config) {
+    g_handle_reload_config = true;
     g_idle_add(reload_config, nullptr);
   }
 }
@@ -199,6 +206,10 @@ bool tkui_key_binding(int key_id) {
   }
   return true;
 }
+
+}  // namespace
+
+namespace {
 
 gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   geany_plugin = plugin;
