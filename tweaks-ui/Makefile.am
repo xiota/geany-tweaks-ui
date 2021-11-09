@@ -18,22 +18,22 @@ tweaks_ui_la_SOURCES = \
 	src/tkui_main.h \
 	src/tkui_settings.cc \
 	src/tkui_settings.h \
+	src/tkui_auto_read_only.cc \
+	src/tkui_auto_read_only.h \
+	src/tkui_colortip.cc \
+	src/tkui_colortip.h \
 	src/tkui_column_markers.cc \
 	src/tkui_column_markers.h \
 	src/tkui_hide_menubar.cc \
 	src/tkui_hide_menubar.h \
-	src/tkui_sidebar_save_position.cc \
-	src/tkui_sidebar_save_position.h \
+	src/tkui_markword.cc \
+	src/tkui_markword.h \
 	src/tkui_sidebar_auto_position.cc \
 	src/tkui_sidebar_auto_position.h \
-	src/tkui_auto_read_only.cc \
-	src/tkui_auto_read_only.h \
+	src/tkui_sidebar_save_position.cc \
+	src/tkui_sidebar_save_position.h \
 	src/auxiliary.cc \
-	src/auxiliary.h \
-	src/ao_colortip.c \
-	src/ao_colortip.h \
-	src/ao_markword.c \
-	src/ao_markword.h
+	src/auxiliary.h
 
 tweaks_ui_la_CXXFLAGS = $(AM_CFLAGS) \
 	-DG_LOG_DOMAIN=\""Tweaks-UI"\" \

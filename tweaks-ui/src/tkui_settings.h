@@ -19,9 +19,11 @@
 #pragma once
 
 #include "tkui_auto_read_only.h"
+#include "tkui_colortip.h"
 #include "tkui_column_markers.h"
 #include "tkui_hide_menubar.h"
 #include "tkui_main.h"
+#include "tkui_markword.h"
 #include "tkui_sidebar_auto_position.h"
 #include "tkui_sidebar_save_position.h"
 
@@ -29,6 +31,7 @@
 
 class TweakUiSettings {
  public:
+  TweakUiSettings() = default;
   ~TweakUiSettings();
 
   void open();
@@ -42,22 +45,23 @@ class TweakUiSettings {
   std::string get_session_file() const { return session_file; }
 
  public:
-  bool markword_enable = false;
-  bool markword_deselect_single_click = false;
-  bool colortip_enable = false;
-  bool colortip_chooser_double_click = false;
-
+  TweakUiAutoReadOnly auto_read_only;
   TweakUiColumnMarkers column_markers;
+  TweakUiColorTip colortip;
   TweakUiHideMenubar hide_menubar;
+  TweakUiMarkWord markword;
   TweakUiSidebarSavePosition sidebar_save_position;
   TweakUiSidebarAutoPosition sidebar_auto_position;
-  TweakUiAutoReadOnly auto_read_only;
 
  private:
   bool kf_has_key(std::string const &key);
 
   void kf_set_boolean(std::string const &key, bool const &val);
   bool kf_get_boolean(std::string const &key, bool const &def);
+
+  void kf_set_double(std::string const &key, double const &val);
+  double kf_get_double(std::string const &key, double const &def,
+                       double const &min);
 
   void kf_set_integer(std::string const &key, int const &val);
   int kf_get_integer(std::string const &key, int const &def, int const &min);

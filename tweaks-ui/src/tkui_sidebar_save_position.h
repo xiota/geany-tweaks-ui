@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "tkui_addon.h"
+#include "tkui_addons.h"
 
 class TweakUiSidebarSavePosition {
  public:
