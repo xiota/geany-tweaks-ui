@@ -22,7 +22,7 @@
 
 class TweakUiSidebarSavePosition {
  public:
-  void initialize(GtkWidget *_geany_window);
+  void initialize(GeanyMainWidgets *main_widgets);
   bool getEnabled() const;
   void setEnabled(bool const val);
 
@@ -39,7 +39,8 @@ class TweakUiSidebarSavePosition {
 
  private:
   bool enabled = false;
-  gulong ulHandlePanePosition = false;
+  ulong ulHandlePanePosition = false;
   GtkWidget *geany_window = nullptr;
   GtkWidget *geany_hpane = nullptr;
+  GtkWidget *geany_sidebar = nullptr;
 };

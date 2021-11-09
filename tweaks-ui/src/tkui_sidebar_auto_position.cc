@@ -20,11 +20,14 @@
 
 #include "tkui_sidebar_auto_position.h"
 
-void TweakUiSidebarAutoPosition::initialize(GtkWidget *_geany_window) {
-  geany_window = _geany_window;
-  if (geany_window) {
+void TweakUiSidebarAutoPosition::initialize(GeanyMainWidgets *main_widgets) {
+  if (main_widgets) {
+    geany_window = main_widgets->window;
+    geany_sidebar = main_widgets->sidebar_notebook;
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
     update_connection();
+
+    bPanedLeft = geany_sidebar == gtk_paned_get_child1(GTK_PANED(geany_hpane));
   }
 
   update_position();
@@ -90,23 +93,43 @@ void TweakUiSidebarAutoPosition::update_hpane() {
     update_position();
   }
 
+  static bool maximized_previous = false;
+
   GdkWindowState wstate =
       gdk_window_get_state(gtk_widget_get_window(geany_window));
 
-  static bool window_maximized_previous = false;
-  bool window_maximized_current =
-      wstate & (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN);
+  bool fullscreen = wstate & GDK_WINDOW_STATE_FULLSCREEN;
+  bool maximized_current = wstate & GDK_WINDOW_STATE_MAXIMIZED;
 
-  if (window_maximized_current != window_maximized_previous) {
-    if (window_maximized_current) {
-      if (position_maximized >= 0) {
-        gtk_paned_set_position(GTK_PANED(geany_hpane), position_maximized);
+  // doesn't work well with full screen
+  if (fullscreen) {
+    return;
+  }
+
+  if (maximized_current != maximized_previous) {
+    int width, height;
+    gtk_window_get_size(GTK_WINDOW(geany_window), &width, &height);
+    bPanedLeft = geany_sidebar == gtk_paned_get_child1(GTK_PANED(geany_hpane));
+
+    if (maximized_current) {
+      if (0 <= position_maximized) {
+        if (!bPanedLeft) {
+          gtk_paned_set_position(GTK_PANED(geany_hpane), position_maximized);
+        } else if (position_maximized <= width) {
+          gtk_paned_set_position(GTK_PANED(geany_hpane),
+                                 width - position_maximized);
+        }
       }
     } else {
-      if (position_normal >= 0) {
-        gtk_paned_set_position(GTK_PANED(geany_hpane), position_normal);
+      if (0 <= position_normal) {
+        if (!bPanedLeft) {
+          gtk_paned_set_position(GTK_PANED(geany_hpane), position_normal);
+        } else if (position_normal <= width) {
+          gtk_paned_set_position(GTK_PANED(geany_hpane),
+                                 width - position_normal);
+        }
       }
     }
-    window_maximized_previous = window_maximized_current;
+    maximized_previous = maximized_current;
   }
 }
