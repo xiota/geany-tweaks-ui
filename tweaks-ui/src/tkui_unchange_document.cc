@@ -1,5 +1,5 @@
 /*
- * Sidebar Auto Position - Tweaks-UI Plugin for Geany
+ * Unchange Document - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "tkui_unchange_document.h"
 
-#include "tkui_addons.h"
+void TweakUiUnchangeDocument::document_signal(GeanyDocument *doc) {
+  if (!DOC_VALID(doc)) {
+    return;
+  }
 
-class TweakUiAutoReadOnly {
- public:
-  void initialize();
-  void set_readonly();
-  void toggle();
-  void document_signal();
-
- public:
-  bool enable = false;
-
- private:
-  GtkWidget* main_window = nullptr;
-  GtkCheckMenuItem* readonly_menu_item = nullptr;
-};
+  if (doc->real_path == nullptr) {
+    if (0 == scintilla_send_message(doc->editor->sci, SCI_GETLENGTH, 0, 0)) {
+      document_set_text_changed(doc, false);
+    }
+  }
+}

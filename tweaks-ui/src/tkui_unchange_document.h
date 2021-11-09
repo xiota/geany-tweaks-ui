@@ -1,5 +1,5 @@
 /*
- * Sidebar Auto Position - Tweaks-UI Plugin for Geany
+ * Unchange Document - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,31 +20,14 @@
 
 #include "tkui_addons.h"
 
-class TweakUiSidebarAutoPosition {
+#define DOUBLE_CLICK_DELAY 50
+
+class TweakUiUnchangeDocument {
  public:
-  void initialize();
-  bool getEnabled() const;
-  void setEnabled(bool const val);
-  void disconnect();
+  void document_signal(GeanyDocument *doc);
 
  public:
-  int position_maximized = -1;
-  int position_normal = -1;
-  int columns_maximized = -1;
-  int columns_normal = -1;
+  bool enable = false;
 
- private:
-  void connect(bool enable);
-  void update_position();
-  void update_hpane();
-  static gboolean hpane_callback(GtkWidget *hpane, cairo_t *cr,
-                                 gpointer user_data);
-
- private:
-  bool enabled = false;
-  bool bPanedLeft = true;
-  ulong ulHandlePanePosition = false;
-  GtkWidget *geany_window = nullptr;
-  GtkWidget *geany_hpane = nullptr;
-  GtkWidget *geany_sidebar = nullptr;
+  private:
 };

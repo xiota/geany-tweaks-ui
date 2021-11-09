@@ -26,14 +26,12 @@
 #include "tkui_markword.h"
 #include "tkui_sidebar_auto_position.h"
 #include "tkui_sidebar_save_position.h"
+#include "tkui_unchange_document.h"
 
 #define TKUI_KF_GROUP "tweaks"
 
 class TweakUiSettings {
  public:
-  TweakUiSettings() = default;
-  ~TweakUiSettings();
-
   void open();
   void close();
   void load();
@@ -52,6 +50,7 @@ class TweakUiSettings {
   TweakUiMarkWord markword;
   TweakUiSidebarSavePosition sidebar_save_position;
   TweakUiSidebarAutoPosition sidebar_auto_position;
+  TweakUiUnchangeDocument unchange_document;
 
  private:
   bool kf_has_key(std::string const &key);

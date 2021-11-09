@@ -21,8 +21,6 @@
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TweakUiSettings::~TweakUiSettings() { close(); }
-
 void TweakUiSettings::open() {
   config_file =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
@@ -86,10 +84,12 @@ void TweakUiSettings::save() {
   kf_set_boolean("sidebar_auto_size_enabled",
                  sidebar_auto_position.getEnabled());
 
+  kf_set_boolean("auto_read_only", auto_read_only.enable);
+
   kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
   kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
 
-  kf_set_boolean("auto_read_only", auto_read_only.enable);
+  kf_set_boolean("unchange_document_enable", unchange_document.enable);
 
   kf_set_boolean("markword_enable", markword.enable);
   kf_set_boolean("markword_single_click_deselect",
@@ -110,6 +110,7 @@ void TweakUiSettings::save() {
   }
 
   save_session();
+  bSaveInProgress = false;
 }
 
 void TweakUiSettings::save_session() {
@@ -147,8 +148,6 @@ void TweakUiSettings::save_session() {
   if (!contents.empty()) {
     file_set_contents(config_file, contents);
   }
-
-  bSaveInProgress = false;
 }
 
 void TweakUiSettings::load() {
@@ -191,11 +190,13 @@ void TweakUiSettings::load() {
     sidebar_save_position.setEnabled(false);
   }
 
+  auto_read_only.enable = kf_get_boolean("auto_read_only", false);
+
   hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
   hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
   hide_menubar.previous_state = kf_get_boolean("menubar_previous_state", true);
 
-  auto_read_only.enable = kf_get_boolean("auto_read_only", false);
+  unchange_document.enable = kf_get_boolean("unchange_document_enable", false);
 
   markword.enable = kf_get_boolean("markword_enable", false);
   markword.single_click_deselect =

@@ -18,11 +18,11 @@
 
 #include "tkui_sidebar_save_position.h"
 
-void TweakUiSidebarSavePosition::initialize(GeanyMainWidgets *main_widgets) {
-  if (main_widgets) {
-    geany_window = main_widgets->window;
+void TweakUiSidebarSavePosition::initialize() {
+  if (geany_data && geany_data->main_widgets) {
+    geany_window = geany_data->main_widgets->window;
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
-    update_connection();
+    connect(enabled);
   }
 }
 
@@ -30,16 +30,18 @@ bool TweakUiSidebarSavePosition::getEnabled() const { return enabled; }
 
 void TweakUiSidebarSavePosition::setEnabled(bool const val) {
   enabled = val;
-  update_connection();
+  connect(enabled);
 }
 
-void TweakUiSidebarSavePosition::update_connection() {
-  if (enabled && !ulHandlePanePosition) {
+void TweakUiSidebarSavePosition::disconnect() { connect(false); }
+
+void TweakUiSidebarSavePosition::connect(bool enable) {
+  if (enable && geany_hpane && !ulHandlePanePosition) {
     ulHandlePanePosition = g_signal_connect(GTK_WIDGET(geany_hpane), "draw",
                                             G_CALLBACK(hpane_callback), this);
   }
 
-  if (!enabled && ulHandlePanePosition) {
+  if (!enable && geany_hpane && ulHandlePanePosition) {
     g_clear_signal_handler(&ulHandlePanePosition, GTK_WIDGET(geany_hpane));
   }
 }
@@ -49,7 +51,7 @@ gboolean TweakUiSidebarSavePosition::hpane_callback(GtkWidget *hpane,
                                                     gpointer user_data) {
   TweakUiSidebarSavePosition *self = (TweakUiSidebarSavePosition *)user_data;
   if (!self->enabled) {
-    self->update_connection();
+    self->connect(self->enabled);
     return false;
   }
 
@@ -60,7 +62,7 @@ gboolean TweakUiSidebarSavePosition::hpane_callback(GtkWidget *hpane,
 void TweakUiSidebarSavePosition::update_hpane() {
   if (!geany_hpane || !geany_window) {
     enabled = false;
-    update_connection();
+    connect(enabled);
     return;
   }
 
