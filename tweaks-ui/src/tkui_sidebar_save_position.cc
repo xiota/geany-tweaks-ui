@@ -18,9 +18,9 @@
 
 #include "tkui_sidebar_save_position.h"
 
-void TweakUiSidebarSavePosition::initialize(GtkWidget *_geany_window) {
-  geany_window = _geany_window;
-  if (geany_window) {
+void TweakUiSidebarSavePosition::initialize(GeanyMainWidgets *main_widgets) {
+  if (main_widgets) {
+    geany_window = main_widgets->window;
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
     update_connection();
   }
