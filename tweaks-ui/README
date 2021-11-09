@@ -1,14 +1,27 @@
+<!-- -*- Markdown -*- -->
+
 # Tweaks-UI Plugin for Geany
 
-This plugin provides user-interface tweaks for Geany.
+This plugin provides (mainly) user-interface tweaks for Geany.
 
 ## Features
 
-* Show multiple column markers in the editor.
-* Set a keybinding to switch among Editor, Sidebar, and Message Window.
-* Save different sidebar sizes for different window states.
-* Auto size the sidebar according to window state.
-* Quick access to the Geany user config folder.
+* Auto Read Only: Automatically switch to read-only mode for files without write permission.
+* Column Markers: Show multiple column markers in the editor.
+* Hide Menubar: Hide the menubar via keybinding.  Restore previous state or hide at startup.
+* Sidebar Save Size: Save different sidebar sizes for maximized and normal window states.
+* Sidebar Auto Size: Automatically size the sidebar to keep a specified number of columns visible in the editor on maximize/unmaximize.
+
+### Ported from the Addons plugin
+
+* ColorTip: Visualize color hex codes in a tooltip.  Open the color chooser tool.
+* MarkWord: Highlight double clicked words throughout the document.
+
+### Keybindings:
+
+* Extra Copy and Paste
+* Toggle menubar visibility
+* Toggle document read-only mode
 
 ## License
 
