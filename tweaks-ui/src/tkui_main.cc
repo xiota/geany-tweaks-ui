@@ -42,8 +42,6 @@ GtkWidget *geany_menubar = nullptr;
 
 GtkWidget *g_tweaks_menu = nullptr;
 
-// AoMarkWord *gMarkWord = nullptr;
-
 GeanyKeyGroup *gKeyGroup = nullptr;
 
 TweakUiSettings settings;
@@ -59,7 +57,7 @@ bool tkui_signal_editor_notify(GObject *object, GeanyEditor *editor,
                                SCNotification *nt, gpointer data) {
   settings.colortip.editor_notify(editor, nt);
   settings.markword.editor_notify(editor, nt);
-
+  settings.unchange_document.document_signal(editor->document);
   return false;
 }
 
@@ -69,6 +67,7 @@ void tkui_signal_document_activate(GObject *obj, GeanyDocument *doc,
 
   settings.auto_read_only.document_signal();
   settings.column_markers.show_idle();
+  settings.unchange_document.document_signal(doc);
 }
 
 void tkui_signal_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
@@ -127,11 +126,12 @@ gboolean reload_config(gpointer user_data) {
   settings.load();
 
   settings.hide_menubar.startup();
+
+  settings.auto_read_only.initialize();
   settings.column_markers.show_idle();
 
-  settings.sidebar_save_position.initialize(geany->main_widgets);
-  settings.sidebar_auto_position.initialize(geany->main_widgets);
-  settings.auto_read_only.initialize(GTK_WIDGET(geany_window));
+  settings.sidebar_auto_position.initialize();
+  settings.sidebar_save_position.initialize();
 
   g_handle_reload_config = 0;
   return FALSE;
@@ -301,7 +301,11 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
 void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
   gtk_widget_destroy(g_tweaks_menu);
 
+  settings.sidebar_auto_position.disconnect();
+  settings.sidebar_save_position.disconnect();
+
   settings.save_session();
+  settings.close();
 }
 
 GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,

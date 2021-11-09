@@ -18,11 +18,10 @@
 
 #include "tkui_auto_read_only.h"
 
-void TweakUiAutoReadOnly::initialize(GtkWidget* mw) {
-  if (mw) {
-    main_window = mw;
-    readonly_menu_item = GTK_CHECK_MENU_ITEM(
-        ui_lookup_widget(GTK_WIDGET(main_window), "set_file_readonly1"));
+void TweakUiAutoReadOnly::initialize() {
+  if (geany_data && geany_data->main_widgets->window) {
+    readonly_menu_item = GTK_CHECK_MENU_ITEM(ui_lookup_widget(
+        GTK_WIDGET(geany_data->main_widgets->window), "set_file_readonly1"));
   }
 }
 
@@ -32,7 +31,9 @@ void TweakUiAutoReadOnly::document_signal() {
   }
 
   GeanyDocument* doc = document_get_current();
-  g_return_if_fail(DOC_VALID(doc));
+  if (!DOC_VALID(doc)) {
+    return;
+  }
 
   if (doc->real_path && euidaccess(doc->real_path, W_OK) != 0) {
     set_readonly();

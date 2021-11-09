@@ -20,12 +20,12 @@
 
 #include "tkui_sidebar_auto_position.h"
 
-void TweakUiSidebarAutoPosition::initialize(GeanyMainWidgets *main_widgets) {
-  if (main_widgets) {
-    geany_window = main_widgets->window;
-    geany_sidebar = main_widgets->sidebar_notebook;
+void TweakUiSidebarAutoPosition::initialize() {
+  if (geany_data && geany_data->main_widgets) {
+    geany_window = geany_data->main_widgets->window;
+    geany_sidebar = geany_data->main_widgets->sidebar_notebook;
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
-    update_connection();
+    connect(enabled);
 
     bPanedLeft = geany_sidebar == gtk_paned_get_child1(GTK_PANED(geany_hpane));
   }
@@ -55,16 +55,18 @@ bool TweakUiSidebarAutoPosition::getEnabled() const { return enabled; }
 
 void TweakUiSidebarAutoPosition::setEnabled(bool const val) {
   enabled = val;
-  update_connection();
+  connect(enabled);
 }
 
-void TweakUiSidebarAutoPosition::update_connection() {
-  if (enabled && !ulHandlePanePosition) {
+void TweakUiSidebarAutoPosition::disconnect() { connect(false); }
+
+void TweakUiSidebarAutoPosition::connect(bool enable) {
+  if (enable && geany_hpane && !ulHandlePanePosition) {
     ulHandlePanePosition = g_signal_connect(GTK_WIDGET(geany_hpane), "draw",
                                             G_CALLBACK(hpane_callback), this);
   }
 
-  if (!enabled && ulHandlePanePosition) {
+  if (!enable && geany_hpane && ulHandlePanePosition) {
     g_clear_signal_handler(&ulHandlePanePosition, GTK_WIDGET(geany_hpane));
   }
 }
@@ -74,7 +76,7 @@ gboolean TweakUiSidebarAutoPosition::hpane_callback(GtkWidget *hpane,
                                                     gpointer user_data) {
   TweakUiSidebarAutoPosition *self = (TweakUiSidebarAutoPosition *)user_data;
   if (!self->enabled) {
-    self->update_connection();
+    self->connect(self->enabled);
     return false;
   }
 
@@ -85,7 +87,7 @@ gboolean TweakUiSidebarAutoPosition::hpane_callback(GtkWidget *hpane,
 void TweakUiSidebarAutoPosition::update_hpane() {
   if (!geany_hpane || !geany_window) {
     enabled = false;
-    update_connection();
+    connect(enabled);
     return;
   }
 

@@ -22,9 +22,10 @@
 
 class TweakUiSidebarSavePosition {
  public:
-  void initialize(GeanyMainWidgets *main_widgets);
+  void initialize();
   bool getEnabled() const;
   void setEnabled(bool const val);
+  void disconnect();
 
  public:
   int position_maximized = -1;
@@ -32,7 +33,7 @@ class TweakUiSidebarSavePosition {
   bool position_update = true;
 
  private:
-  void update_connection();
+  void connect(bool enable);
   void update_hpane();
   static gboolean hpane_callback(GtkWidget *hpane, cairo_t *cr,
                                  gpointer user_data);

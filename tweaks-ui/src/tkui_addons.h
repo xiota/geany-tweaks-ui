@@ -43,7 +43,6 @@ extern GeanyData *geany_data;
 #define G_SOURCE_FUNC(f) ((GSourceFunc)(void (*)(void))(f))
 #endif  // G_SOURCE_FUNC
 
-// g_clear_signal_handler was added in glib 2.62
 #if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 62
 #include "gobject/gsignal.h"
 #define g_clear_signal_handler(handler, instance)      \
