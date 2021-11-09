@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "tkui_addon.h"
+#include "tkui_addons.h"
 
 class TweakUiColumnMarkers {
  public:

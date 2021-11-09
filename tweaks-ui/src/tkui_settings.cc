@@ -91,12 +91,13 @@ void TweakUiSettings::save() {
 
   kf_set_boolean("auto_read_only", auto_read_only.enable);
 
-  kf_set_boolean("markword_enable", markword_enable);
-  kf_set_boolean("markword_deselect_single_click",
-                 markword_deselect_single_click);
-  kf_set_boolean("colortip_enable", colortip_enable);
-  kf_set_boolean("colortip_chooser_double_click",
-                 colortip_chooser_double_click);
+  kf_set_boolean("markword_enable", markword.enable);
+  kf_set_boolean("markword_single_click_deselect",
+                 markword.single_click_deselect);
+
+  kf_set_boolean("colortip_tooltip", colortip.color_tooltip);
+  kf_set_string("colortip_tooltip_size", colortip.color_tooltip_size);
+  kf_set_boolean("colortip_chooser", colortip.color_chooser);
 
   kf_set_boolean("column_marker_enable", column_markers.enable);
 
@@ -196,12 +197,13 @@ void TweakUiSettings::load() {
 
   auto_read_only.enable = kf_get_boolean("auto_read_only", false);
 
-  markword_enable = kf_get_boolean("markword_enable", false);
-  markword_deselect_single_click =
-      kf_get_boolean("markword_deselect_single_click", false);
-  colortip_enable = kf_get_boolean("colortip_enable", false);
-  colortip_chooser_double_click =
-      kf_get_boolean("colortip_chooser_double_click", false);
+  markword.enable = kf_get_boolean("markword_enable", false);
+  markword.single_click_deselect =
+      kf_get_boolean("markword_single_click_deselect", true);
+
+  colortip.color_tooltip = kf_get_boolean("colortip_tooltip", false);
+  colortip.setSize(kf_get_string("colortip_tooltip_size", "small"));
+  colortip.color_chooser = kf_get_boolean("colortip_chooser", false);
 
   {
     column_markers.enable = kf_get_boolean("column_marker_enable", false);

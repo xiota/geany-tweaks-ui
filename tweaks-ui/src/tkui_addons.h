@@ -23,6 +23,22 @@
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
 
+#define GFREE(_z_) \
+  do {             \
+    g_free(_z_);   \
+    _z_ = nullptr; \
+  } while (0)
+
+#define GERROR_FREE(_z_) \
+  do {                   \
+    g_error_free(_z_);   \
+    _z_ = nullptr;       \
+  } while (0)
+
+#define GEANY_PSC(sig, cb)                                                  \
+  plugin_signal_connect(geany_plugin, nullptr, (sig), true, G_CALLBACK(cb), \
+                        nullptr)
+
 #if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 58
 #define G_SOURCE_FUNC(f) ((GSourceFunc)(void (*)(void))(f))
 #endif  // G_SOURCE_FUNC

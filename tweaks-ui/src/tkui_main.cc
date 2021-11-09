@@ -22,8 +22,7 @@
 
 #include <time.h>
 
-#include "ao_colortip.h"
-#include "ao_markword.h"
+//#include "ao_markword.h"
 #include "auxiliary.h"
 #include "tkui_main.h"
 #include "tkui_settings.h"
@@ -44,8 +43,7 @@ GtkWidget *geany_menubar = nullptr;
 
 GtkWidget *g_tweaks_menu = nullptr;
 
-AoMarkWord *gMarkWord = nullptr;
-AoColorTip *gColorTip = nullptr;
+// AoMarkWord *gMarkWord = nullptr;
 
 GeanyKeyGroup *gKeyGroup = nullptr;
 
@@ -60,8 +58,9 @@ namespace {
 
 bool tkui_signal_editor_notify(GObject *object, GeanyEditor *editor,
                                SCNotification *nt, gpointer data) {
-  ao_mark_editor_notify(gMarkWord, editor, nt);
-  ao_color_tip_editor_notify(gColorTip, editor, nt);
+  // ao_mark_editor_notify(gMarkWord, editor, nt);
+  settings.markword.editor_notify(editor, nt);
+  settings.colortip.editor_notify(editor, nt);
 
   return false;
 }
@@ -77,8 +76,9 @@ void tkui_signal_document_activate(GObject *obj, GeanyDocument *doc,
 void tkui_signal_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_new(gMarkWord, doc);
-  ao_color_tip_document_new(gColorTip, doc);
+  // ao_mark_document_new(gMarkWord, doc);
+  settings.markword.document_new(doc);
+  settings.colortip.document_new(doc);
 
   settings.column_markers.show_idle();
 }
@@ -87,8 +87,9 @@ void tkui_signal_document_open(GObject *obj, GeanyDocument *doc,
                                gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_open(gMarkWord, doc);
-  ao_color_tip_document_open(gColorTip, doc);
+  // ao_mark_document_open(gMarkWord, doc);
+  settings.markword.document_open(doc);
+  settings.colortip.document_open(doc);
 
   settings.auto_read_only.document_signal();
   settings.column_markers.show_idle();
@@ -98,8 +99,9 @@ void tkui_signal_document_close(GObject *obj, GeanyDocument *doc,
                                 gpointer data) {
   g_return_if_fail(doc != NULL && doc->is_valid);
 
-  ao_mark_document_close(gMarkWord, doc);
-  ao_color_tip_document_close(gColorTip, doc);
+  // ao_mark_document_close(gMarkWord, doc);
+  settings.markword.document_close(doc);
+  settings.colortip.document_close(doc);
 }
 
 void tkui_signal_document_reload(GObject *obj, GeanyDocument *doc,
@@ -136,10 +138,8 @@ gboolean reload_config(gpointer user_data) {
   settings.sidebar_auto_position.initialize(GTK_WIDGET(geany_window));
   settings.auto_read_only.initialize(GTK_WIDGET(geany_window));
 
-  ao_mark_word_set(gMarkWord, settings.markword_enable,
-                   settings.markword_deselect_single_click);
-  ao_color_tip_set(gColorTip, settings.colortip_enable,
-                   settings.colortip_chooser_double_click);
+  //  ao_mark_word_set(gMarkWord, settings.markword_enable,
+  //                   settings.markword_deselect_single_click);
 
   g_handle_reload_config = 0;
   return FALSE;
@@ -299,10 +299,8 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
                                        TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY);
 
   // ported from Addons plugin
-  gMarkWord = ao_mark_word_new(settings.markword_enable,
-                               settings.markword_deselect_single_click);
-  gColorTip = ao_color_tip_new(settings.colortip_enable,
-                               settings.colortip_chooser_double_click);
+  // gMarkWord = ao_mark_word_new(settings.markword_enable,
+  //                              settings.markword_deselect_single_click);
 
   if (g_handle_reload_config == 0) {
     g_handle_reload_config = 1;
@@ -317,8 +315,7 @@ void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
 
   // pane_position_update(false);
 
-  g_object_unref(gMarkWord);
-  g_object_unref(gColorTip);
+  // g_object_unref(gMarkWord);
 
   settings.save_session();
 }
