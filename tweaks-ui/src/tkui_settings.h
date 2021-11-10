@@ -43,6 +43,10 @@ class TweakUiSettings {
   std::string get_session_file() const { return session_file; }
 
  public:
+  std::string description =
+      _(" After editing this file, use `Tools/Tweaks-UI/Reload Config File`.\n"
+        " Otherwise the settings will be overwritten when Geany is closed.");
+
   TweakUiAutoReadOnly auto_read_only;
   TweakUiColumnMarkers column_markers;
   TweakUiColorTip colortip;
@@ -67,6 +71,8 @@ class TweakUiSettings {
 
   void kf_set_string(std::string const &key, std::string const &val);
   std::string kf_get_string(std::string const &key, std::string const &def);
+
+  void kf_set_comment(std::string const &key, std::string const &val);
 
  private:
   bool bSaveInProgress = false;

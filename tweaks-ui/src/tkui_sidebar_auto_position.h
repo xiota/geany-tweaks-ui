@@ -28,6 +28,10 @@ class TweakUiSidebarAutoPosition {
   void disconnect();
 
  public:
+  std::string description = _(
+      "\n SidebarAutoSize: Autosize the sidebar to keep the specified a number\n"
+      "    of columns visible in the editor.Increase the value to make room\n"
+      "    for line numbers.");
   int position_maximized = -1;
   int position_normal = -1;
   int columns_maximized = -1;

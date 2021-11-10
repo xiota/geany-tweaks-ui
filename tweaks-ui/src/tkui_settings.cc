@@ -73,35 +73,67 @@ void TweakUiSettings::save() {
   // Load old contents in case user changed file outside of GUI
   g_key_file_load_from_file(
       keyfile, config_file.c_str(),
-      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+      GKeyFileFlags(G_KEY_FILE_NONE),
       nullptr);
 
-  kf_set_boolean("sidebar_save_size_enabled",
-                 sidebar_save_position.getEnabled());
-  kf_set_boolean("sidebar_save_size_update",
-                 sidebar_save_position.position_update);
+  kf_set_comment("", description.c_str());
 
-  kf_set_boolean("sidebar_auto_size_enabled",
-                 sidebar_auto_position.getEnabled());
+  {  // sidebar save position
+    kf_set_comment("sidebar_save_size_enabled",
+                   sidebar_save_position.description.c_str());
+    kf_set_boolean("sidebar_save_size_enabled",
+                   sidebar_save_position.getEnabled());
+    kf_set_comment("sidebar_save_size_update",
+                   sidebar_save_position.desc_position_update.c_str());
+    kf_set_boolean("sidebar_save_size_update",
+                   sidebar_save_position.position_update);
+  }
+  {  // sidebar auto size
+    kf_set_comment("sidebar_auto_size_enabled",
+                   sidebar_auto_position.description.c_str());
+    kf_set_boolean("sidebar_auto_size_enabled",
+                   sidebar_auto_position.getEnabled());
+  }
+  {  // AutoReadOnly
+    kf_set_comment("auto_read_only", auto_read_only.desc_enable.c_str());
+    kf_set_boolean("auto_read_only", auto_read_only.enable);
+  }
+  {  // HideMenubar
+    kf_set_comment("menubar_hide_on_start",
+                   hide_menubar.desc_hide_on_start.c_str());
+    kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
+    kf_set_comment("menubar_restore_state",
+                   hide_menubar.desc_restore_state.c_str());
+    kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
+  }
+  {  // unchange document
+    kf_set_comment("unchange_document_enable",
+                   unchange_document.desc_enable.c_str());
+    kf_set_boolean("unchange_document_enable", unchange_document.enable);
+  }
+  {  // MarkWord
+    kf_set_comment("markword_enable", markword.desc_enable.c_str());
+    kf_set_boolean("markword_enable", markword.enable);
+    kf_set_comment("markword_single_click_deselect",
+                   markword.desc_single_click_deselect.c_str());
+    kf_set_boolean("markword_single_click_deselect",
+                   markword.single_click_deselect);
+  }
+  {  // ColorTip
+    kf_set_comment("colortip_tooltip", colortip.desc_color_tooltip.c_str());
+    kf_set_boolean("colortip_tooltip", colortip.color_tooltip);
 
-  kf_set_boolean("auto_read_only", auto_read_only.enable);
+    kf_set_comment("colortip_tooltip_size",
+                   colortip.desc_color_tooltip_size.c_str());
+    kf_set_string("colortip_tooltip_size", colortip.color_tooltip_size);
 
-  kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
-  kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
+    kf_set_comment("colortip_chooser", colortip.desc_color_chooser.c_str());
+    kf_set_boolean("colortip_chooser", colortip.color_chooser);
+  }
+  {  // ColumnMarker
+    kf_set_comment("column_marker_enable", column_markers.desc_enable.c_str());
+    kf_set_boolean("column_marker_enable", column_markers.enable);
 
-  kf_set_boolean("unchange_document_enable", unchange_document.enable);
-
-  kf_set_boolean("markword_enable", markword.enable);
-  kf_set_boolean("markword_single_click_deselect",
-                 markword.single_click_deselect);
-
-  kf_set_boolean("colortip_tooltip", colortip.color_tooltip);
-  kf_set_string("colortip_tooltip_size", colortip.color_tooltip_size);
-  kf_set_boolean("colortip_chooser", colortip.color_chooser);
-
-  kf_set_boolean("column_marker_enable", column_markers.enable);
-
-  {
     std::string str_columns;
     std::string str_colors;
     column_markers.get_columns(str_columns, str_colors);
@@ -122,7 +154,7 @@ void TweakUiSettings::save_session() {
     // Load old contents in case user changed file outside of GUI
     g_key_file_load_from_file(
         keyfile, config_file.c_str(),
-        GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+        GKeyFileFlags(G_KEY_FILE_NONE),
         nullptr);
   }
 
@@ -157,7 +189,7 @@ void TweakUiSettings::load() {
 
   g_key_file_load_from_file(
       keyfile, config_file.c_str(),
-      GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS),
+      GKeyFileFlags(G_KEY_FILE_NONE),
       nullptr);
 
   if (!g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
@@ -273,6 +305,17 @@ std::string TweakUiSettings::kf_get_string(std::string const &key,
     return cstr_assign(val);
   } else {
     return def;
+  }
+}
+
+void TweakUiSettings::kf_set_comment(std::string const &key,
+                                     std::string const &val) {
+  if (key.empty()) {
+    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, nullptr, val.c_str(),
+                           nullptr);
+  } else {
+    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, key.c_str(), val.c_str(),
+                           nullptr);
   }
 }
 

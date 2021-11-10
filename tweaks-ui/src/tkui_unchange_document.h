@@ -33,6 +33,9 @@ class TweakUiUnchangeDocument {
                               TweakUiUnchangeDocument *self);
 
  public:
+  std::string desc_enable =
+      _("\n UnchangeDocument: Set change state to false for unsaved, "
+        "empty documents.");
   bool enable = false;
 
  private:
