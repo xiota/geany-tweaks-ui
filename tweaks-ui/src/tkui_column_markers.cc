@@ -28,19 +28,10 @@ void TweakUiColumnMarkers::initialize() {
   GEANY_PSC("document-open", document_signal, this);
   GEANY_PSC("document-new", document_signal, this);
   GEANY_PSC("document-reload", document_signal, this);
-
-  GEANY_PSC("project-close", project_signal, this);
-  GEANY_PSC("project-open", project_signal, this);
-  GEANY_PSC("project-save", project_signal, this);
 }
 
 void TweakUiColumnMarkers::document_signal(GObject *obj, GeanyDocument *doc,
                                            TweakUiColumnMarkers *self) {
-  self->show_idle();
-}
-
-void TweakUiColumnMarkers::project_signal(GObject *obj, GKeyFile *config,
-                                          TweakUiColumnMarkers *self) {
   self->show_idle();
 }
 
