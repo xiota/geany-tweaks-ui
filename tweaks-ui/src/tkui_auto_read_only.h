@@ -23,14 +23,17 @@
 class TweakUiAutoReadOnly {
  public:
   void initialize();
-  void set_readonly();
+  void check_read_only(GeanyDocument* doc);
+  void set_read_only();
   void toggle();
-  void document_signal();
+
+  static void document_signal(GObject* obj, GeanyDocument* doc,
+                              TweakUiAutoReadOnly* self);
 
  public:
   bool enable = false;
 
  private:
   GtkWidget* main_window = nullptr;
-  GtkCheckMenuItem* readonly_menu_item = nullptr;
+  GtkCheckMenuItem* read_only_menu_item = nullptr;
 };

@@ -21,10 +21,25 @@
 
 #include "tkui_markword.h"
 
-// There might be a small risk that the current document
-// is not the one we want but this is very unlikely.
-void TweakUiMarkWord::clear_marker() {
-  GeanyDocument *doc = document_get_current();
+void TweakUiMarkWord::initialize() {
+  // connect the button-press event for all open documents
+  if (enable && main_is_realized()) {
+    guint i = 0;
+    foreach_document(i) {
+      connect_document_button_press_signal_handler(documents[i]);
+    }
+  }
+
+  GEANY_PSC("document-open", document_signal, this);
+  GEANY_PSC("document-new", document_signal, this);
+  GEANY_PSC("document-close", document_close, this);
+  GEANY_PSC("editor-notify", editor_notify, this);
+}
+
+void TweakUiMarkWord::clear_marker(GeanyDocument *doc) {
+  if (!DOC_VALID(doc)) {
+    doc = document_get_current();
+  }
   // clear current search indicators
   if (DOC_VALID(doc)) {
     editor_indicator_clear(doc->editor, GEANY_INDICATOR_SEARCH);
@@ -59,16 +74,6 @@ gboolean TweakUiMarkWord::on_editor_button_press_event(GtkWidget *widget,
   return false;
 }
 
-void TweakUiMarkWord::initialize() {
-  // connect the button-press event for all open documents
-  if (enable && main_is_realized()) {
-    guint i = 0;
-    foreach_document(i) {
-      connect_document_button_press_signal_handler(documents[i]);
-    }
-  }
-}
-
 void TweakUiMarkWord::connect_document_button_press_signal_handler(
     GeanyDocument *doc) {
   g_return_if_fail(DOC_VALID(doc));
@@ -78,37 +83,37 @@ void TweakUiMarkWord::connect_document_button_press_signal_handler(
                         G_CALLBACK(on_editor_button_press_event), this);
 }
 
-void TweakUiMarkWord::document_new(GeanyDocument *doc) {
-  connect_document_button_press_signal_handler(doc);
+void TweakUiMarkWord::document_signal(GObject *obj, GeanyDocument *doc,
+                                      TweakUiMarkWord *self) {
+  self->connect_document_button_press_signal_handler(doc);
 }
 
-void TweakUiMarkWord::document_open(GeanyDocument *doc) {
-  connect_document_button_press_signal_handler(doc);
-}
-
-void TweakUiMarkWord::document_close(GeanyDocument *doc) {
+void TweakUiMarkWord::document_close(GObject *obj, GeanyDocument *doc,
+                                     TweakUiMarkWord *self) {
   g_return_if_fail(DOC_VALID(doc));
 
   g_signal_handlers_disconnect_by_func(
-      doc->editor->sci, gpointer(on_editor_button_press_event), this);
+      doc->editor->sci, gpointer(on_editor_button_press_event), self);
 }
 
-void TweakUiMarkWord::editor_notify(GeanyEditor *editor, SCNotification *nt) {
+bool TweakUiMarkWord::editor_notify(GObject *object, GeanyEditor *editor,
+                                    SCNotification *nt, TweakUiMarkWord *self) {
   // If something is about to be deleted and
   // there is selected text clear the markers
   if (nt->nmhdr.code == SCN_MODIFIED &&
       ((nt->modificationType & SC_MOD_BEFOREDELETE) == SC_MOD_BEFOREDELETE) &&
       sci_has_selection(editor->sci)) {
-    if (enable && single_click_deselect) {
-      clear_marker();
+    if (self->enable && self->single_click_deselect) {
+      clear_marker(editor->document);
     }
   }
   // In single click deselect mode, clear the markers when the cursor moves
   else if (nt->nmhdr.code == SCN_UPDATEUI &&
            nt->updated == SC_UPDATE_SELECTION &&
            !sci_has_selection(editor->sci)) {
-    if (enable && single_click_deselect) {
-      clear_marker();
+    if (self->enable && self->single_click_deselect) {
+      clear_marker(editor->document);
     }
   }
+  return false;
 }

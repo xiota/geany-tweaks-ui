@@ -26,13 +26,12 @@
 #include "tkui_main.h"
 #include "tkui_settings.h"
 
-/* ********************
- * Globals
- */
+// global variables
+
 GeanyPlugin *geany_plugin;
 GeanyData *geany_data;
 
-namespace {  // global variable
+namespace {  // useful variables
 
 GtkWindow *geany_window = nullptr;
 GtkNotebook *geany_sidebar = nullptr;
@@ -44,77 +43,9 @@ GtkWidget *g_tweaks_menu = nullptr;
 
 GeanyKeyGroup *gKeyGroup = nullptr;
 
+// There should be no need to access settings outside this file
+// because each class has access to its own settings.
 TweakUiSettings settings;
-
-}  // namespace
-
-namespace {
-/* ********************
- * Geany Signal Callbacks
- */
-
-bool tkui_signal_editor_notify(GObject *object, GeanyEditor *editor,
-                               SCNotification *nt, gpointer data) {
-  settings.colortip.editor_notify(editor, nt);
-  settings.markword.editor_notify(editor, nt);
-  settings.unchange_document.document_signal(editor->document);
-  return false;
-}
-
-void tkui_signal_document_activate(GObject *obj, GeanyDocument *doc,
-                                   gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  settings.auto_read_only.document_signal();
-  settings.column_markers.show_idle();
-  settings.unchange_document.document_signal(doc);
-}
-
-void tkui_signal_document_new(GObject *obj, GeanyDocument *doc, gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  settings.column_markers.show_idle();
-
-  settings.colortip.document_new(doc);
-  settings.markword.document_new(doc);
-}
-
-void tkui_signal_document_open(GObject *obj, GeanyDocument *doc,
-                               gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  settings.auto_read_only.document_signal();
-  settings.column_markers.show_idle();
-
-  settings.colortip.document_open(doc);
-  settings.markword.document_open(doc);
-}
-
-void tkui_signal_document_close(GObject *obj, GeanyDocument *doc,
-                                gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  settings.colortip.document_close(doc);
-  settings.markword.document_close(doc);
-}
-
-void tkui_signal_document_reload(GObject *obj, GeanyDocument *doc,
-                                 gpointer data) {
-  g_return_if_fail(doc != NULL && doc->is_valid);
-
-  settings.auto_read_only.document_signal();
-  settings.column_markers.show_idle();
-}
-
-void tkui_signal_startup_complete(GObject *obj, GeanyDocument *doc,
-                                  gpointer data) {
-  settings.hide_menubar.startup();
-  settings.column_markers.show_idle();
-}
-
-void tkui_signal_project_signal(GObject *obj, GKeyFile *config, gpointer data) {
-  settings.column_markers.show_idle();
-}
 
 }  // namespace
 
@@ -125,16 +56,14 @@ bool g_handle_reload_config = false;
 gboolean reload_config(gpointer user_data) {
   settings.load();
 
-  settings.hide_menubar.startup();
-
-  settings.auto_read_only.initialize();
   settings.column_markers.show_idle();
+  settings.hide_menubar.startup();
 
   settings.sidebar_auto_position.initialize();
   settings.sidebar_save_position.initialize();
 
-  g_handle_reload_config = 0;
-  return FALSE;
+  g_handle_reload_config = false;
+  return false;
 }
 
 void tkui_pref_reload_config(GtkWidget *self, GtkWidget *dialog) {
@@ -204,6 +133,16 @@ bool tkui_key_binding(int key_id) {
       return false;
   }
   return true;
+}
+
+}  // namespace
+
+namespace {
+
+void tkui_signal_startup_complete(GObject *obj, GeanyDocument *doc,
+                                  gpointer data) {
+  settings.hide_menubar.startup();
+  settings.column_markers.show_idle();
 }
 
 }  // namespace
@@ -286,9 +225,14 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
                        _("Toggle document read-only state"), nullptr);
 
   // initialize hide menubar
-  settings.hide_menubar.set_menubar_widget(geany_menubar);
-  settings.hide_menubar.set_keybinding(gKeyGroup,
-                                       TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY);
+  settings.hide_menubar.initialize(gKeyGroup,
+                                   TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY);
+
+  settings.auto_read_only.initialize();
+  settings.colortip.initialize();
+  settings.column_markers.initialize();
+  settings.markword.initialize();
+  settings.unchange_document.initialize();
 
   if (g_handle_reload_config == 0) {
     g_handle_reload_config = 1;
@@ -360,20 +304,6 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
   return box;
 }
 
-PluginCallback tkui_plugin_callbacks[] = {
-    {"document-activate", (GCallback)&tkui_signal_document_activate, true,
-     nullptr},
-    {"document-close", (GCallback)&tkui_signal_document_close, true, nullptr},
-    {"document-new", (GCallback)&tkui_signal_document_new, true, nullptr},
-    {"document-open", (GCallback)&tkui_signal_document_open, true, nullptr},
-    {"document-reload", (GCallback)&tkui_signal_document_reload, true, nullptr},
-    {"editor-notify", (GCallback)&tkui_signal_editor_notify, true, nullptr},
-    {"geany-startup-complete", (GCallback)&tkui_signal_startup_complete, true,
-     nullptr},
-    {"project-close", (GCallback)&tkui_signal_project_signal, true, nullptr},
-    {"project-open", (GCallback)&tkui_signal_project_signal, true, nullptr},
-    {"project-save", (GCallback)&tkui_signal_project_signal, true, nullptr},
-    {nullptr, nullptr, false, nullptr}};
 }  // namespace
 
 G_MODULE_EXPORT
@@ -392,7 +322,9 @@ void geany_load_module(GeanyPlugin *plugin) {
   plugin->funcs->cleanup = tkui_plugin_cleanup;
   plugin->funcs->help = nullptr;
   plugin->funcs->configure = tkui_plugin_configure;
-  plugin->funcs->callbacks = tkui_plugin_callbacks;
+  plugin->funcs->callbacks = nullptr;
+
+  GEANY_PSC("geany-startup-complete", tkui_signal_startup_complete, nullptr);
 
   // register
   GEANY_PLUGIN_REGISTER(plugin, 226);

@@ -19,9 +19,32 @@
 #include "auxiliary.h"
 #include "tkui_column_markers.h"
 
-gboolean TweakUiColumnMarkers::show_idle_callback(gpointer user_data) {
-  TweakUiColumnMarkers *self = (TweakUiColumnMarkers *)user_data;
+void TweakUiColumnMarkers::initialize() {
+  if (enable && main_is_realized()) {
+    guint i = 0;
+    foreach_document(i) { show(documents[i]); }
+  }
 
+  GEANY_PSC("document-open", document_signal, this);
+  GEANY_PSC("document-new", document_signal, this);
+  GEANY_PSC("document-reload", document_signal, this);
+
+  GEANY_PSC("project-close", project_signal, this);
+  GEANY_PSC("project-open", project_signal, this);
+  GEANY_PSC("project-save", project_signal, this);
+}
+
+void TweakUiColumnMarkers::document_signal(GObject *obj, GeanyDocument *doc,
+                                           TweakUiColumnMarkers *self) {
+  self->show_idle();
+}
+
+void TweakUiColumnMarkers::project_signal(GObject *obj, GKeyFile *config,
+                                          TweakUiColumnMarkers *self) {
+  self->show_idle();
+}
+
+gboolean TweakUiColumnMarkers::show_idle_callback(TweakUiColumnMarkers *self) {
   self->show();
   self->bHandleShowIdleInProgress = false;
   return false;
@@ -30,7 +53,7 @@ gboolean TweakUiColumnMarkers::show_idle_callback(gpointer user_data) {
 void TweakUiColumnMarkers::show_idle() {
   if (!bHandleShowIdleInProgress) {
     bHandleShowIdleInProgress = true;
-    g_idle_add(show_idle_callback, this);
+    g_idle_add(G_SOURCE_FUNC(show_idle_callback), this);
   }
 }
 
@@ -44,12 +67,14 @@ void TweakUiColumnMarkers::add_column(int nColumn, int nColor) {
   vn_colors.push_back(nColor);
 }
 
-void TweakUiColumnMarkers::show() {
+void TweakUiColumnMarkers::show(GeanyDocument *doc) {
   if (!enable) {
     return;
   }
 
-  GeanyDocument *doc = document_get_current();
+  if (!DOC_VALID(doc)) {
+    doc = document_get_current();
+  }
   g_return_if_fail(DOC_VALID(doc));
 
   scintilla_send_message(doc->editor->sci, SCI_SETEDGEMODE, 3, 3);

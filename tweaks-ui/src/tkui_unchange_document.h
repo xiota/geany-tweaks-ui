@@ -24,10 +24,16 @@
 
 class TweakUiUnchangeDocument {
  public:
-  void document_signal(GeanyDocument *doc);
+  void initialize();
+  void unchange(GeanyDocument *doc);
+
+  static bool editor_notify(GObject *object, GeanyEditor *editor,
+                            SCNotification *nt, TweakUiUnchangeDocument *self);
+  static void document_signal(GObject *obj, GeanyDocument *doc,
+                              TweakUiUnchangeDocument *self);
 
  public:
   bool enable = false;
 
-  private:
+ private:
 };

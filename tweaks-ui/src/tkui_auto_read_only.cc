@@ -20,36 +20,48 @@
 
 void TweakUiAutoReadOnly::initialize() {
   if (geany_data && geany_data->main_widgets->window) {
-    readonly_menu_item = GTK_CHECK_MENU_ITEM(ui_lookup_widget(
+    read_only_menu_item = GTK_CHECK_MENU_ITEM(ui_lookup_widget(
         GTK_WIDGET(geany_data->main_widgets->window), "set_file_readonly1"));
   }
+
+  if (enable && main_is_realized()) {
+    guint i = 0;
+    foreach_document(i) { check_read_only(documents[i]); }
+  }
+
+  GEANY_PSC("document-activate", document_signal, this);
+  GEANY_PSC("document-open", document_signal, this);
+  GEANY_PSC("document-reload", document_signal, this);
 }
 
-void TweakUiAutoReadOnly::document_signal() {
+void TweakUiAutoReadOnly::document_signal(GObject* obj, GeanyDocument* doc,
+                                          TweakUiAutoReadOnly* self) {
+  self->check_read_only(doc);
+}
+
+void TweakUiAutoReadOnly::check_read_only(GeanyDocument* doc) {
   if (!enable) {
     return;
   }
-
-  GeanyDocument* doc = document_get_current();
   if (!DOC_VALID(doc)) {
     return;
   }
 
   if (doc->real_path && euidaccess(doc->real_path, W_OK) != 0) {
-    set_readonly();
+    set_read_only();
   }
 }
 
-void TweakUiAutoReadOnly::set_readonly() {
-  if (readonly_menu_item) {
-    gtk_check_menu_item_set_active(readonly_menu_item, true);
+void TweakUiAutoReadOnly::set_read_only() {
+  if (read_only_menu_item) {
+    gtk_check_menu_item_set_active(read_only_menu_item, true);
   }
 }
 
 void TweakUiAutoReadOnly::toggle() {
-  if (readonly_menu_item) {
+  if (read_only_menu_item) {
     gtk_check_menu_item_set_active(
-        readonly_menu_item,
-        !gtk_check_menu_item_get_active(readonly_menu_item));
+        read_only_menu_item,
+        !gtk_check_menu_item_get_active(read_only_menu_item));
   }
 }

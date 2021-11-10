@@ -18,8 +18,26 @@
 
 #include "tkui_unchange_document.h"
 
-void TweakUiUnchangeDocument::document_signal(GeanyDocument *doc) {
-  if (!DOC_VALID(doc)) {
+void TweakUiUnchangeDocument::initialize() {
+  GEANY_PSC("editor-notify", editor_notify, this);
+  // GEANY_PSC("document-activate", document_signal, this);
+}
+
+bool TweakUiUnchangeDocument::editor_notify(GObject *object,
+                                            GeanyEditor *editor,
+                                            SCNotification *nt,
+                                            TweakUiUnchangeDocument *self) {
+  self->unchange(editor->document);
+  return false;
+}
+
+void TweakUiUnchangeDocument::document_signal(GObject *obj, GeanyDocument *doc,
+                                              TweakUiUnchangeDocument *self) {
+  self->unchange(doc);
+}
+
+void TweakUiUnchangeDocument::unchange(GeanyDocument *doc) {
+  if (!enable || !DOC_VALID(doc)) {
     return;
   }
 

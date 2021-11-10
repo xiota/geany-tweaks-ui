@@ -21,26 +21,13 @@
 #include "auxiliary.h"
 #include "tkui_hide_menubar.h"
 
-bool TweakUiHideMenubar::hide() {
-  if (gtk_widget_is_visible(geany_menubar)) {
-    if (keybinding && keybinding->key != 0) {
-      gtk_widget_hide(geany_menubar);
-      std::string val =
-          cstr_assign(gtk_accelerator_name(keybinding->key, keybinding->mods));
-      msgwin_status_add(_("Menubar has been hidden.  To reshow it, use: %s"),
-                        val.c_str());
-      return true;
-    } else {
-      msgwin_status_add(
-          _("Menubar will not be hidden until after a keybinding "
-            "to reshow it has been set."));
-      return false;
-    }
+void TweakUiHideMenubar::initialize(GeanyKeyGroup *group, gsize key_id) {
+  keybinding = keybindings_get_item(group, key_id);
+  if (geany_data && geany_data->main_widgets->window) {
+    geany_menubar = ui_lookup_widget(
+        GTK_WIDGET(geany_data->main_widgets->window), "hbox_menubar");
   }
-  return false;
 }
-
-void TweakUiHideMenubar::show() { gtk_widget_show(geany_menubar); }
 
 void TweakUiHideMenubar::startup() {
   if (hide_on_start) {
@@ -62,10 +49,23 @@ bool TweakUiHideMenubar::get_state() {
   return gtk_widget_is_visible(geany_menubar);
 }
 
-void TweakUiHideMenubar::set_menubar_widget(GtkWidget *widget) {
-  geany_menubar = widget;
-}
+void TweakUiHideMenubar::show() { gtk_widget_show(geany_menubar); }
 
-void TweakUiHideMenubar::set_keybinding(GeanyKeyGroup *group, gsize key_id) {
-  keybinding = keybindings_get_item(group, key_id);
+bool TweakUiHideMenubar::hide() {
+  if (gtk_widget_is_visible(geany_menubar)) {
+    if (keybinding && keybinding->key != 0) {
+      gtk_widget_hide(geany_menubar);
+      std::string val =
+          cstr_assign(gtk_accelerator_name(keybinding->key, keybinding->mods));
+      msgwin_status_add(_("Menubar has been hidden.  To reshow it, use: %s"),
+                        val.c_str());
+      return true;
+    } else {
+      msgwin_status_add(
+          _("Menubar will not be hidden until after a keybinding "
+            "to reshow it has been set."));
+      return false;
+    }
+  }
+  return false;
 }

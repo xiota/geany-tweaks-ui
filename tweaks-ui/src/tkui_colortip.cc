@@ -22,6 +22,23 @@
 #include "auxiliary.h"
 #include "tkui_colortip.h"
 
+void TweakUiColorTip::initialize() {
+  // connect the button-press event for all open documents
+  if (color_chooser && main_is_realized()) {
+    uint i = 0;
+    foreach_document(i) {
+      connect_document_button_press_signal_handler(documents[i]);
+    }
+  }
+
+  GEANY_PSC("document-open", document_signal, this);
+  GEANY_PSC("document-new", document_signal, this);
+  GEANY_PSC("document-close", document_close, this);
+  GEANY_PSC("editor-notify", editor_notify, this);
+
+  setSize();
+}
+
 /* Find a color value (short or long form, e.g. #fff or #ffffff) in the
  * given string. position must be inside the found color or at maximum
  * maxdist bytes in front of it (in front of the start of the color value)
@@ -139,18 +156,6 @@ gboolean TweakUiColorTip::on_editor_button_press_event(GtkWidget *widget,
   return false;
 }
 
-void TweakUiColorTip::initialize() {
-  // connect the button-press event for all open documents
-  if (color_chooser && main_is_realized()) {
-    uint i = 0;
-    foreach_document(i) {
-      connect_document_button_press_signal_handler(documents[i]);
-    }
-  }
-
-  setSize();
-}
-
 void TweakUiColorTip::setSize(std::string strSize) {
   to_lower_inplace(trim_inplace(strSize));
   if (!strSize.empty()) {
@@ -180,31 +185,28 @@ void TweakUiColorTip::connect_document_button_press_signal_handler(
                         G_CALLBACK(on_editor_button_press_event), this);
 }
 
-void TweakUiColorTip::document_new(GeanyDocument *doc) {
+void TweakUiColorTip::document_signal(GObject *obj, GeanyDocument *doc,
+                                      TweakUiColorTip *self) {
   g_return_if_fail(DOC_VALID(doc));
-  connect_document_button_press_signal_handler(doc);
+  self->connect_document_button_press_signal_handler(doc);
   scintilla_send_message(doc->editor->sci, SCI_SETMOUSEDWELLTIME, 300, 0);
 }
 
-void TweakUiColorTip::document_open(GeanyDocument *doc) {
-  g_return_if_fail(DOC_VALID(doc));
-  connect_document_button_press_signal_handler(doc);
-  scintilla_send_message(doc->editor->sci, SCI_SETMOUSEDWELLTIME, 300, 0);
-}
-
-void TweakUiColorTip::document_close(GeanyDocument *doc) {
+void TweakUiColorTip::document_close(GObject *obj, GeanyDocument *doc,
+                                     TweakUiColorTip *self) {
   g_return_if_fail(DOC_VALID(doc));
 
   g_signal_handlers_disconnect_by_func(
-      doc->editor->sci, gpointer(on_editor_button_press_event), this);
+      doc->editor->sci, gpointer(on_editor_button_press_event), self);
 }
 
-void TweakUiColorTip::editor_notify(GeanyEditor *editor, SCNotification *nt) {
+bool TweakUiColorTip::editor_notify(GObject *object, GeanyEditor *editor,
+                                    SCNotification *nt, TweakUiColorTip *self) {
   ScintillaObject *sci = editor->sci;
 
   // Ignore all events if color tips are disabled in preferences
-  if (!color_tooltip) {
-    return;
+  if (!self->color_tooltip) {
+    return false;
   }
 
   switch (nt->nmhdr.code) {
@@ -237,7 +239,7 @@ void TweakUiColorTip::editor_notify(GeanyEditor *editor, SCNotification *nt) {
         if (color != -1) {
           scintilla_send_message(sci, SCI_CALLTIPSETBACK, color, 0);
           scintilla_send_message(sci, SCI_CALLTIPSHOW, nt->position,
-                                 (sptr_t)colortip_template.c_str());
+                                 (sptr_t)self->colortip_template.c_str());
         }
         g_free(subtext);
       }
@@ -247,4 +249,5 @@ void TweakUiColorTip::editor_notify(GeanyEditor *editor, SCNotification *nt) {
       scintilla_send_message(sci, SCI_CALLTIPCANCEL, 0, 0);
       break;
   }
+  return false;
 }
