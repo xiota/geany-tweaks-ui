@@ -20,6 +20,8 @@
 
 #include <geanyplugin.h>
 
+#include <string>
+
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
 

@@ -31,6 +31,15 @@ class TweakUiColorTip {
   void setSize(std::string strSize = "");
 
  public:
+  std::string desc_color_tooltip =
+      _("\n ColorTip: Show hex colors in tooltips when the mouse hovers over them.");
+
+  /// The first letter is significant.  (S)mall, (M)edium, (L)arge.
+  std::string desc_color_tooltip_size =
+      _("    Tooltip size: small, medium, large.");
+
+  std::string desc_color_chooser =
+      _("    Start the color chooser when double clicking a color value.");
   bool color_tooltip = false;
   bool color_chooser = false;
   std::string color_tooltip_size{"small"};

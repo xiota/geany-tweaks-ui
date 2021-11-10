@@ -30,6 +30,10 @@ class TweakUiMarkWord {
   void initialize();
 
  public:
+  std::string desc_enable =
+      _("\n MarkWord: Mark all occurrences of a word when double-clicking it.");
+  std::string desc_single_click_deselect =
+      _("    Deselect the previous highlight by single click");
   bool enable = false;
   bool single_click_deselect = true;
 

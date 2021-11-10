@@ -39,6 +39,9 @@ class TweakUiColumnMarkers {
   std::pair<std::string, std::string> get_columns();
 
  public:
+  std::string desc_enable =
+      _("\n ColumnMarkers: Show column markers at the specified columns.\n"
+        "    Colors are in #RRGGBB or #RGB formats.");
   bool enable = false;
 
  private:
