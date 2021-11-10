@@ -28,23 +28,28 @@
 class TweakUiMarkWord {
  public:
   void initialize();
-  void document_new(GeanyDocument *doc);
-  void document_open(GeanyDocument *doc);
-  void document_close(GeanyDocument *doc);
-  void editor_notify(GeanyEditor *editor, SCNotification *nt);
 
  public:
   bool enable = false;
   bool single_click_deselect = true;
 
  private:
-  void connect_document_button_press_signal_handler(GeanyDocument *doc);
+  static void document_signal(GObject *obj, GeanyDocument *doc,
+                              TweakUiMarkWord *self);
 
-  static void clear_marker();
+  static void document_close(GObject *obj, GeanyDocument *doc,
+                             TweakUiMarkWord *self);
+
+  static bool editor_notify(GObject *object, GeanyEditor *editor,
+                            SCNotification *nt, TweakUiMarkWord *self);
+
+  static void clear_marker(GeanyDocument *doc = nullptr);
   static gboolean mark_word(TweakUiMarkWord *self);
   static gboolean on_editor_button_press_event(GtkWidget *widget,
                                                GdkEventButton *event,
                                                TweakUiMarkWord *self);
+
+  void connect_document_button_press_signal_handler(GeanyDocument *doc);
 
  private:
   gulong double_click_timer_id = 0;

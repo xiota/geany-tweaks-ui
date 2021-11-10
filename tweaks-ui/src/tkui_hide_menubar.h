@@ -22,15 +22,12 @@
 
 class TweakUiHideMenubar {
  public:
-  void initialize();
+  void initialize(GeanyKeyGroup *group, gsize key_id);
   bool hide();
   void show();
   void startup();
   void toggle();
   bool get_state();
-
-  void set_keybinding(GeanyKeyGroup *group, gsize key_id);
-  void set_menubar_widget(GtkWidget *widget);
 
  public:
   bool hide_on_start = false;

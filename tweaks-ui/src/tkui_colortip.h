@@ -28,10 +28,6 @@
 class TweakUiColorTip {
  public:
   void initialize();
-  void document_new(GeanyDocument *doc);
-  void document_open(GeanyDocument *doc);
-  void document_close(GeanyDocument *doc);
-  void editor_notify(GeanyEditor *editor, SCNotification *nt);
   void setSize(std::string strSize = "");
 
  public:
@@ -40,13 +36,22 @@ class TweakUiColorTip {
   std::string color_tooltip_size{"small"};
 
  private:
-  void connect_document_button_press_signal_handler(GeanyDocument *doc);
+  static void document_signal(GObject *obj, GeanyDocument *doc,
+                              TweakUiColorTip *self);
+
+  static void document_close(GObject *obj, GeanyDocument *doc,
+                             TweakUiColorTip *self);
+
+  static bool editor_notify(GObject *object, GeanyEditor *editor,
+                            SCNotification *nt, TweakUiColorTip *self);
 
   static int contains_color_value(char *string, int position, int maxdist);
   static int get_color_value_at_current_doc_position();
   static gboolean on_editor_button_press_event(GtkWidget *widget,
                                                GdkEventButton *event,
                                                TweakUiColorTip *self);
+
+  void connect_document_button_press_signal_handler(GeanyDocument *doc);
 
  private:
   std::string colortip_template{"    "};

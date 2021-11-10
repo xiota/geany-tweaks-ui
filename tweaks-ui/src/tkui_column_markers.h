@@ -27,7 +27,8 @@ class TweakUiColumnMarkers {
  public:
   TweakUiColumnMarkers() = default;
 
-  void show();
+  void initialize();
+  void show(GeanyDocument *doc = nullptr);
   void show_idle();
   void clear_columns();
   void add_column(int nColumn, int nColor);
@@ -41,7 +42,12 @@ class TweakUiColumnMarkers {
   bool enable = false;
 
  private:
-  static gboolean show_idle_callback(gpointer user_data);
+  static gboolean show_idle_callback(TweakUiColumnMarkers *self);
+
+  static void document_signal(GObject *obj, GeanyDocument *doc,
+                              TweakUiColumnMarkers *self);
+  static void project_signal(GObject *obj, GKeyFile *config,
+                             TweakUiColumnMarkers *self);
 
  private:
   bool bHandleShowIdleInProgress = false;
