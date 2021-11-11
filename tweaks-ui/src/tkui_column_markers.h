@@ -49,8 +49,6 @@ class TweakUiColumnMarkers {
 
   static void document_signal(GObject *obj, GeanyDocument *doc,
                               TweakUiColumnMarkers *self);
-  static void project_signal(GObject *obj, GKeyFile *config,
-                             TweakUiColumnMarkers *self);
 
  private:
   bool bHandleShowIdleInProgress = false;

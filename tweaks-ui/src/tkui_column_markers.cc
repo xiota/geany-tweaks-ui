@@ -25,8 +25,9 @@ void TweakUiColumnMarkers::initialize() {
     foreach_document(i) { show(documents[i]); }
   }
 
-  GEANY_PSC("document-open", document_signal, this);
+  GEANY_PSC("document-activate", document_signal, this);
   GEANY_PSC("document-new", document_signal, this);
+  GEANY_PSC("document-open", document_signal, this);
   GEANY_PSC("document-reload", document_signal, this);
 }
 
@@ -65,8 +66,8 @@ void TweakUiColumnMarkers::show(GeanyDocument *doc) {
 
   if (!DOC_VALID(doc)) {
     doc = document_get_current();
+    g_return_if_fail(DOC_VALID(doc));
   }
-  g_return_if_fail(DOC_VALID(doc));
 
   scintilla_send_message(doc->editor->sci, SCI_SETEDGEMODE, 3, 3);
   scintilla_send_message(doc->editor->sci, SCI_MULTIEDGECLEARALL, 0, 0);

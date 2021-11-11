@@ -142,7 +142,6 @@ namespace {
 void tkui_signal_startup_complete(GObject *obj, GeanyDocument *doc,
                                   gpointer data) {
   settings.hide_menubar.startup();
-  settings.column_markers.show_idle();
 }
 
 }  // namespace
@@ -259,42 +258,42 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
 
   box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
 
-  tooltip = g_strdup("Save the active settings to the config file.");
-  btn = gtk_button_new_with_label("Save Config");
+  tooltip = g_strdup(_("Save the active settings to the config file."));
+  btn = gtk_button_new_with_label(_("Save Config"));
   g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_save_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
 
   tooltip = g_strdup(
-      "Reload settings from the config file.  May be used "
-      "to apply preferences after editing without restarting Geany.");
-  btn = gtk_button_new_with_label("Reload Config");
+      _("Reload settings from the config file.  May be used "
+        "to apply preferences after editing without restarting Geany."));
+  btn = gtk_button_new_with_label(_("Reload Config"));
   g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_reload_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
 
-  tooltip = g_strdup(
-      "Delete the current config file and restore the default "
-      "file with explanatory comments.");
-  btn = gtk_button_new_with_label("Reset Config");
+  tooltip =
+      g_strdup(_("Delete the current config file and restore the default "
+                 "settings with explanatory comments."));
+  btn = gtk_button_new_with_label(_("Reset Config"));
   g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_reset_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
 
-  tooltip = g_strdup("Open the config file in Geany for editing.");
-  btn = gtk_button_new_with_label("Edit Config");
+  tooltip = g_strdup(_("Open the config file in Geany for editing."));
+  btn = gtk_button_new_with_label(_("Edit Config"));
   g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_edit_config), dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
   gtk_widget_set_tooltip_text(btn, tooltip);
   GFREE(tooltip);
 
   tooltip = g_strdup(
-      "Open the config folder in the default file manager.  The config folder "
-      "contains the stylesheets, which may be edited.");
-  btn = gtk_button_new_with_label("Open Config Folder");
+      _("Open the config folder in the default file manager.  The config "
+        "folder contains stylesheets, which may be edited."));
+  btn = gtk_button_new_with_label(_("Open Config Folder"));
   g_signal_connect(btn, "clicked", G_CALLBACK(tkui_pref_open_config_folder),
                    dialog);
   gtk_box_pack_start(GTK_BOX(box), btn, false, false, 3);
