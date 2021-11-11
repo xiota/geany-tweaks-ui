@@ -31,10 +31,10 @@ class TweakUiAutoReadOnly {
                               TweakUiAutoReadOnly* self);
 
  public:
-  std::string desc_enable = _(
-      "\n AutoReadOnly: Automatically sets read-only mode when the user does\n"
-      "    not have write permissions.  Permissions are checked on document\n"
-      "    open, reload, and activation.");
+  std::string desc_enable =
+      _("AutoReadOnly: Automatically sets read-only mode when the user does "
+        "not have write permissions.  Permissions are checked on document "
+        "open, reload, and activation.");
   bool enable = false;
 
  private:

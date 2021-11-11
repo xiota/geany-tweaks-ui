@@ -35,7 +35,7 @@ class TweakUiSettings {
   void open();
   void close();
   void load();
-  void save();
+  void save(bool bSession = false);
   void save_session();
   void reset();
 
@@ -43,10 +43,6 @@ class TweakUiSettings {
   std::string get_session_file() const { return session_file; }
 
  public:
-  std::string description =
-      _(" After editing this file, use `Tools/Tweaks-UI/Reload Config File`.\n"
-        " Otherwise the settings will be overwritten when Geany is closed.");
-
   TweakUiAutoReadOnly auto_read_only;
   TweakUiColumnMarkers column_markers;
   TweakUiColorTip colortip;
@@ -77,7 +73,6 @@ class TweakUiSettings {
  private:
   bool bSaveInProgress = false;
   GKeyFile *keyfile = nullptr;
-  GKeyFile *session = nullptr;
   std::string config_file;
   std::string session_file;
 };

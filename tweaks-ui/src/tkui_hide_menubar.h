@@ -31,14 +31,14 @@ class TweakUiHideMenubar {
 
  public:
   std::string desc_hide_on_start =
-      _("\n HideMenubar: Hide the menubar on start.\n"
-        "    The menubar will not be hidden until after a keybinding is set.");
+      _("HideMenubar: Hide the menubar on start.  "
+        "The menubar will not be hidden until after a keybinding is set.");
   std::string desc_restore_state =
-      _("    Restore the menubar state from when Geany was last shut down.");
+      _("Restore the menubar state from when Geany was last shut down.");
   bool hide_on_start = false;
   bool restore_state = false;
   std::string desc_previous_state =
-      _("    The menubar state when Geany was last shut down.");
+      _("The menubar state when Geany was last shut down.");
   bool previous_state = true;
 
  private:

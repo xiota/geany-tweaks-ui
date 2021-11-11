@@ -28,14 +28,14 @@ class TweakUiSidebarSavePosition {
   void disconnect();
 
  public:
-  std::string description = _(
-      "\n SidebarSaveSize: Save separate sidebar positions for when the window\n"
-      "     is normal or maximized.");
+  std::string description =
+      _("SidebarSaveSize: Save separate sidebar positions for when the "
+        "window is normal or maximized.");
   int position_maximized = -1;
   int position_normal = -1;
   std::string desc_position_update =
-      _("    Update the saved sidebar positions when they are changed.\n"
-        "    When false, the previously saved positions will be used.");
+      _("Update the saved sidebar positions when they are changed.  "
+        "When false, the previously saved positions will be used.");
   bool position_update = true;
 
  private:
