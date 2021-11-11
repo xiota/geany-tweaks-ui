@@ -22,6 +22,8 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void TweakUiSettings::open() {
+  keyfile = g_key_file_new();
+
   config_file =
       cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
                                    "tweaks", "tweaks-ui.conf", nullptr));
@@ -30,10 +32,11 @@ void TweakUiSettings::open() {
 
   // if file does not exist, create it
   if (!g_file_test(config_file.c_str(), G_FILE_TEST_EXISTS)) {
-    reset();
+    file_set_contents(config_file, "[tweaks]");
+    load();
+    save();
+    save();
   }
-
-  keyfile = g_key_file_new();
 }
 
 void TweakUiSettings::close() {
@@ -56,14 +59,14 @@ void TweakUiSettings::reset() {
     g_object_unref(file);
   }
 
-  // copy default config
-  std::string contents = file_get_contents(TWEAKS_CONFIG);
-  if (!contents.empty()) {
-    file_set_contents(config_file, contents);
-  }
+  // file_set_contents(config_file, "[tweaks]");
+
+  TweakUiSettings new_settings;
+  new_settings.open();
+  new_settings.close();
 }
 
-void TweakUiSettings::save() {
+void TweakUiSettings::save(bool bSession) {
   if (!keyfile) {
     return;
   }
@@ -71,67 +74,89 @@ void TweakUiSettings::save() {
   bSaveInProgress = true;
 
   // Load old contents in case user changed file outside of GUI
-  g_key_file_load_from_file(
-      keyfile, config_file.c_str(),
-      GKeyFileFlags(G_KEY_FILE_NONE),
-      nullptr);
+  g_key_file_load_from_file(keyfile, config_file.c_str(),
+                            GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS), nullptr);
 
-  kf_set_comment("", description.c_str());
-
-  {  // sidebar save position
+  // sidebar save position
+  if (!bSession) {
     kf_set_comment("sidebar_save_size_enabled",
-                   sidebar_save_position.description.c_str());
+                   "\n " + sidebar_save_position.description);
     kf_set_boolean("sidebar_save_size_enabled",
                    sidebar_save_position.getEnabled());
     kf_set_comment("sidebar_save_size_update",
-                   sidebar_save_position.desc_position_update.c_str());
+                   "   " + sidebar_save_position.desc_position_update);
     kf_set_boolean("sidebar_save_size_update",
                    sidebar_save_position.position_update);
   }
-  {  // sidebar auto size
+  kf_set_integer("sidebar_save_size_normal",
+                 sidebar_save_position.position_normal);
+  kf_set_integer("sidebar_save_size_maximized",
+                 sidebar_save_position.position_maximized);
+
+  // sidebar auto size
+  if (!bSession) {
     kf_set_comment("sidebar_auto_size_enabled",
-                   sidebar_auto_position.description.c_str());
+                   "\n " + sidebar_auto_position.description);
     kf_set_boolean("sidebar_auto_size_enabled",
                    sidebar_auto_position.getEnabled());
   }
-  {  // AutoReadOnly
-    kf_set_comment("auto_read_only", auto_read_only.desc_enable.c_str());
+  kf_set_integer("sidebar_auto_size_normal",
+                 sidebar_auto_position.columns_normal);
+  kf_set_integer("sidebar_auto_size_maximized",
+                 sidebar_auto_position.columns_maximized);
+
+  // AutoReadOnly
+  if (!bSession) {
+    kf_set_comment("auto_read_only", "\n " + auto_read_only.desc_enable);
     kf_set_boolean("auto_read_only", auto_read_only.enable);
   }
-  {  // HideMenubar
+
+  // HideMenubar
+  if (!bSession) {
     kf_set_comment("menubar_hide_on_start",
-                   hide_menubar.desc_hide_on_start.c_str());
+                   "\n " + hide_menubar.desc_hide_on_start);
     kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
     kf_set_comment("menubar_restore_state",
-                   hide_menubar.desc_restore_state.c_str());
+                   "   " + hide_menubar.desc_restore_state);
     kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
   }
-  {  // unchange document
+  if (hide_menubar.restore_state) {
+    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
+  }
+
+  // unchange document
+  if (!bSession) {
     kf_set_comment("unchange_document_enable",
-                   unchange_document.desc_enable.c_str());
+                   "\n " + unchange_document.desc_enable);
     kf_set_boolean("unchange_document_enable", unchange_document.enable);
   }
-  {  // MarkWord
-    kf_set_comment("markword_enable", markword.desc_enable.c_str());
+
+  // MarkWord
+  if (!bSession) {
+    kf_set_comment("markword_enable", "\n " + markword.desc_enable);
     kf_set_boolean("markword_enable", markword.enable);
     kf_set_comment("markword_single_click_deselect",
-                   markword.desc_single_click_deselect.c_str());
+                   "   " + markword.desc_single_click_deselect);
     kf_set_boolean("markword_single_click_deselect",
                    markword.single_click_deselect);
   }
-  {  // ColorTip
-    kf_set_comment("colortip_tooltip", colortip.desc_color_tooltip.c_str());
+
+  // ColorTip
+  if (!bSession) {
+    kf_set_comment("colortip_tooltip", "\n " + colortip.desc_color_tooltip);
     kf_set_boolean("colortip_tooltip", colortip.color_tooltip);
 
     kf_set_comment("colortip_tooltip_size",
-                   colortip.desc_color_tooltip_size.c_str());
+                   "   " + colortip.desc_color_tooltip_size);
     kf_set_string("colortip_tooltip_size", colortip.color_tooltip_size);
 
-    kf_set_comment("colortip_chooser", colortip.desc_color_chooser.c_str());
+    kf_set_comment("colortip_chooser", "   " + colortip.desc_color_chooser);
     kf_set_boolean("colortip_chooser", colortip.color_chooser);
   }
-  {  // ColumnMarker
-    kf_set_comment("column_marker_enable", column_markers.desc_enable.c_str());
+
+  // ColumnMarker
+  if (!bSession) {
+    kf_set_comment("column_marker_enable", "\n " + column_markers.desc_enable);
     kf_set_boolean("column_marker_enable", column_markers.enable);
 
     std::string str_columns;
@@ -139,39 +164,6 @@ void TweakUiSettings::save() {
     column_markers.get_columns(str_columns, str_colors);
     kf_set_string("column_marker_columns", str_columns);
     kf_set_string("column_marker_colors", str_colors);
-  }
-
-  save_session();
-  bSaveInProgress = false;
-}
-
-void TweakUiSettings::save_session() {
-  if (!keyfile) {
-    return;
-  }
-
-  if (!bSaveInProgress) {
-    // Load old contents in case user changed file outside of GUI
-    g_key_file_load_from_file(
-        keyfile, config_file.c_str(),
-        GKeyFileFlags(G_KEY_FILE_NONE),
-        nullptr);
-  }
-
-  if (sidebar_save_position.position_update) {
-    kf_set_integer("sidebar_save_size_normal",
-                   sidebar_save_position.position_normal);
-    kf_set_integer("sidebar_save_size_maximized",
-                   sidebar_save_position.position_maximized);
-  }
-
-  kf_set_integer("sidebar_auto_size_normal",
-                 sidebar_auto_position.columns_normal);
-  kf_set_integer("sidebar_auto_size_maximized",
-                 sidebar_auto_position.columns_maximized);
-
-  if (hide_menubar.restore_state) {
-    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
   }
 
   // Store back on disk
@@ -182,15 +174,21 @@ void TweakUiSettings::save_session() {
   }
 }
 
+void TweakUiSettings::save_session() {
+  if (!keyfile) {
+    return;
+  }
+
+  save(true);
+}
+
 void TweakUiSettings::load() {
   if (!keyfile) {
     return;
   }
 
-  g_key_file_load_from_file(
-      keyfile, config_file.c_str(),
-      GKeyFileFlags(G_KEY_FILE_NONE),
-      nullptr);
+  g_key_file_load_from_file(keyfile, config_file.c_str(),
+                            GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS), nullptr);
 
   if (!g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
     return;
@@ -244,9 +242,9 @@ void TweakUiSettings::load() {
     std::string str_columns;
     std::string str_colors;
 
-    str_columns = kf_get_string("column_marker_columns", "60;72;80;88;96;");
+    str_columns = kf_get_string("column_marker_columns", "60;72;80;88;96;104;112;120;128;136;144;152;160;");
     str_colors = kf_get_string("column_marker_colors",
-                               "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;");
+                               "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;");
 
     column_markers.set_columns(str_columns, str_colors);
   }
@@ -314,8 +312,8 @@ void TweakUiSettings::kf_set_comment(std::string const &key,
     g_key_file_set_comment(keyfile, TKUI_KF_GROUP, nullptr, val.c_str(),
                            nullptr);
   } else {
-    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, key.c_str(), val.c_str(),
-                           nullptr);
+    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, key.c_str(),
+                           (" " + val).c_str(), nullptr);
   }
 }
 

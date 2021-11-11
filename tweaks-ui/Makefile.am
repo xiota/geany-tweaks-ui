@@ -7,10 +7,6 @@ include $(top_srcdir)/build/vars.docs.mk
 
 plugin = tweaks_ui
 
-tkui_datadir = $(plugindatadir)
-tkui_data_DATA = \
-	data/tweaks-ui.conf
-
 geanyplugins_LTLIBRARIES = tweaks-ui.la
 
 tweaks_ui_la_SOURCES = \
@@ -38,8 +34,7 @@ tweaks_ui_la_SOURCES = \
 	src/auxiliary.h
 
 tweaks_ui_la_CXXFLAGS = $(AM_CFLAGS) \
-	-DG_LOG_DOMAIN=\""Tweaks-UI"\" \
-	-DTWEAKS_CONFIG=\""$(tkui_datadir)/tweaks-ui.conf"\"
+	-DG_LOG_DOMAIN=\""Tweaks-UI"\"
 
 tweaks_ui_la_CFLAGS = $(AM_CFLAGS)
 tweaks_ui_la_LIBADD = $(COMMONLIBS)
