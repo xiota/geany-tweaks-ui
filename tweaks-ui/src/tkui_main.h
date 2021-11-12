@@ -28,16 +28,11 @@ extern GeanyKeyGroup *keybindings_get_core_group(guint id);
 
 enum TweakUiShortcuts {
   TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY,
-  TKUI_KEY_COPY,
+  TKUI_KEY_COPY_1,
+  TKUI_KEY_COPY_2,
   TKUI_KEY_PASTE_1,
   TKUI_KEY_PASTE_2,
   TKUI_KEY_TOGGLE_READONLY,
 
   TKUI_KEY_COUNT,
 };
-
-#define GFREE(_z_) \
-  do {             \
-    g_free(_z_);   \
-    _z_ = nullptr; \
-  } while (0)

@@ -7,9 +7,9 @@ This plugin provides (mainly) user-interface tweaks for Geany.
 * Auto Read Only: Automatically switch to read-only mode for files without write permission.
 * Column Markers: Show multiple column markers in the editor.
 * Hide Menubar: Hide the menubar via keybinding.  Restore previous state or hide at startup.
-* Sidebar Save Size: Save different sidebar sizes for maximized and normal window states.
 * Sidebar Auto Size: Automatically size the sidebar to keep a specified number of columns visible in the editor on maximize/unmaximize.
 * UnchangeDocument: Unsets the change state for new, empty documents.
+* WindowGeometry: Save/restore window geometry.  Tries to fix *some* of Geany's glitchy save/restore behavior.  Works regardless of whether Geany "save" position settings are enabled.  Also saves and restores different sidebar and message window positions for maximized and normal window states.
 
 ### Ported from the Addons plugin
 
