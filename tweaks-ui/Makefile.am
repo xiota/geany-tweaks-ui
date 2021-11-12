@@ -26,10 +26,10 @@ tweaks_ui_la_SOURCES = \
 	src/tkui_markword.h \
 	src/tkui_sidebar_auto_position.cc \
 	src/tkui_sidebar_auto_position.h \
-	src/tkui_sidebar_save_position.cc \
-	src/tkui_sidebar_save_position.h \
 	src/tkui_unchange_document.cc \
 	src/tkui_unchange_document.h \
+	src/tkui_window_geometry.cc \
+	src/tkui_window_geometry.h \
 	src/auxiliary.cc \
 	src/auxiliary.h
 

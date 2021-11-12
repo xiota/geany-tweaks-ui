@@ -25,8 +25,8 @@
 #include "tkui_main.h"
 #include "tkui_markword.h"
 #include "tkui_sidebar_auto_position.h"
-#include "tkui_sidebar_save_position.h"
 #include "tkui_unchange_document.h"
+#include "tkui_window_geometry.h"
 
 #define TKUI_KF_GROUP "tweaks"
 
@@ -45,12 +45,13 @@ class TweakUiSettings {
  public:
   TweakUiAutoReadOnly auto_read_only;
   TweakUiColumnMarkers column_markers;
-  TweakUiColorTip colortip;
   TweakUiHideMenubar hide_menubar;
-  TweakUiMarkWord markword;
-  TweakUiSidebarSavePosition sidebar_save_position;
   TweakUiSidebarAutoPosition sidebar_auto_position;
   TweakUiUnchangeDocument unchange_document;
+  TweakUiWindowGeometry window_geometry;
+
+  TweakUiColorTip colortip;
+  TweakUiMarkWord markword;
 
  private:
   bool kf_has_key(std::string const &key);

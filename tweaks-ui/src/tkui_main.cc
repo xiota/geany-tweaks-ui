@@ -20,8 +20,6 @@
 #include "config.h"
 #endif
 
-#include <time.h>
-
 #include "auxiliary.h"
 #include "tkui_main.h"
 #include "tkui_settings.h"
@@ -60,7 +58,7 @@ gboolean reload_config(gpointer user_data) {
   settings.hide_menubar.startup();
 
   settings.sidebar_auto_position.initialize();
-  settings.sidebar_save_position.initialize();
+  settings.window_geometry.initialize();
 
   g_handle_reload_config = false;
   return false;
@@ -117,7 +115,8 @@ bool tkui_key_binding(int key_id) {
     case TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY:
       settings.hide_menubar.toggle();
       break;
-    case TKUI_KEY_COPY:
+    case TKUI_KEY_COPY_1:
+    case TKUI_KEY_COPY_2:
       keybindings_send_command(GEANY_KEY_GROUP_CLIPBOARD,
                                GEANY_KEYS_CLIPBOARD_COPY);
       break;
@@ -203,16 +202,21 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   gKeyGroup = plugin_set_key_group(geany_plugin, "Tweaks-UI", TKUI_KEY_COUNT,
                                    (GeanyKeyGroupCallback)tkui_key_binding);
 
-  keybindings_set_item(gKeyGroup, TKUI_KEY_COPY, nullptr, 0, GdkModifierType(0),
-                       "tweaks_ui_copy", _("Edit/Copy"), nullptr);
+  keybindings_set_item(gKeyGroup, TKUI_KEY_COPY_1, nullptr, 0,
+                       GdkModifierType(0), "tweaks_ui_copy_1", _("Edit/Copy 1"),
+                       nullptr);
+
+  keybindings_set_item(gKeyGroup, TKUI_KEY_COPY_2, nullptr, 0,
+                       GdkModifierType(0), "tweaks_ui_copy_2", _("Edit/Copy 2"),
+                       nullptr);
 
   keybindings_set_item(gKeyGroup, TKUI_KEY_PASTE_1, nullptr, 0,
                        GdkModifierType(0), "tweaks_ui_paste_1",
-                       _("Edit/Paste (1)"), nullptr);
+                       _("Edit/Paste 1"), nullptr);
 
   keybindings_set_item(gKeyGroup, TKUI_KEY_PASTE_2, nullptr, 0,
                        GdkModifierType(0), "tweaks_ui_paste_2",
-                       _("Edit/Paste (2)"), nullptr);
+                       _("Edit/Paste 2"), nullptr);
 
   keybindings_set_item(gKeyGroup, TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY, nullptr,
                        0, GdkModifierType(0),
@@ -245,7 +249,7 @@ void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
   gtk_widget_destroy(g_tweaks_menu);
 
   settings.sidebar_auto_position.disconnect();
-  settings.sidebar_save_position.disconnect();
+  settings.window_geometry.disconnect();
 
   settings.save_session();
   settings.close();
