@@ -1,5 +1,5 @@
 /*
- * Auto Read Only - Tweaks-UI Plugin for Geany
+ * Detect File Type on Reload - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,24 +20,22 @@
 
 #include "tkui_addons.h"
 
-class TweakUiAutoReadOnly {
+#define DOUBLE_CLICK_DELAY 50
+
+class TweakUiDetectFileType {
  public:
   void initialize();
-  void check_read_only(GeanyDocument* doc);
-  void set_read_only();
-  void unset_read_only();
-  void toggle();
+  static void document_signal(GObject *obj, GeanyDocument *doc,
+                              TweakUiDetectFileType *self);
 
-  static void document_signal(GObject* obj, GeanyDocument* doc,
-                              TweakUiAutoReadOnly* self);
+  void redetect_filetype(GeanyDocument *doc = nullptr);
+  void force_redetect_filetype(GeanyDocument *doc = nullptr);
 
  public:
   std::string desc_enable =
-      _("AutoReadOnly: Automatically sets and unsets read-only mode when "
-        "documents are activated, depending on file write permissions.");
+      _("DetectFileTypeOnReload: Re-detect file type on reload.  "
+        "Geany normally auto-detects file type only on open and save.");
   bool enable = false;
 
  private:
-  GtkWidget* main_window = nullptr;
-  GtkCheckMenuItem* read_only_menu_item = nullptr;
 };

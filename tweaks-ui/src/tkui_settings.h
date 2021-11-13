@@ -21,6 +21,7 @@
 #include "tkui_auto_read_only.h"
 #include "tkui_colortip.h"
 #include "tkui_column_markers.h"
+#include "tkui_detect_filetype.h"
 #include "tkui_hide_menubar.h"
 #include "tkui_main.h"
 #include "tkui_markword.h"
@@ -49,6 +50,8 @@ class TweakUiSettings {
   TweakUiSidebarAutoPosition sidebar_auto_position;
   TweakUiUnchangeDocument unchange_document;
   TweakUiWindowGeometry window_geometry;
+
+  TweakUiDetectFileType detect_filetype_on_reload;
 
   TweakUiColorTip colortip;
   TweakUiMarkWord markword;

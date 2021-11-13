@@ -25,10 +25,10 @@ void TweakUiColumnMarkers::initialize() {
     foreach_document(i) { show(documents[i]); }
   }
 
-  GEANY_PSC("document-activate", document_signal, this);
-  GEANY_PSC("document-new", document_signal, this);
-  GEANY_PSC("document-open", document_signal, this);
-  GEANY_PSC("document-reload", document_signal, this);
+  GEANY_PSC_AFTER("document-activate", document_signal, this);
+  GEANY_PSC_AFTER("document-new", document_signal, this);
+  GEANY_PSC_AFTER("document-open", document_signal, this);
+  GEANY_PSC_AFTER("document-reload", document_signal, this);
 }
 
 void TweakUiColumnMarkers::document_signal(GObject *obj, GeanyDocument *doc,

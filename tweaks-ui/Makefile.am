@@ -20,6 +20,8 @@ tweaks_ui_la_SOURCES = \
 	src/tkui_colortip.h \
 	src/tkui_column_markers.cc \
 	src/tkui_column_markers.h \
+	src/tkui_detect_filetype.cc \
+	src/tkui_detect_filetype.h \
 	src/tkui_hide_menubar.cc \
 	src/tkui_hide_menubar.h \
 	src/tkui_markword.cc \

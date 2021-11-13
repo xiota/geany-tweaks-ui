@@ -1,5 +1,5 @@
 /*
- * Sidebar Auto Position - Tweaks-UI Plugin for Geany
+ * Auto Read Only - Tweaks-UI Plugin for Geany
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ void TweakUiAutoReadOnly::initialize() {
   // Geany API currently allows changing read-only state only via the menu.
   // The wrong documents are set read only when other document signals are
   // used because of race conditions.
-  GEANY_PSC("document-activate", document_signal, this);
+  GEANY_PSC_AFTER("document-activate", document_signal, this);
 }
 
 void TweakUiAutoReadOnly::document_signal(GObject* obj, GeanyDocument* doc,
