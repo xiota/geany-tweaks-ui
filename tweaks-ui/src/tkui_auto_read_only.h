@@ -25,6 +25,7 @@ class TweakUiAutoReadOnly {
   void initialize();
   void check_read_only(GeanyDocument* doc);
   void set_read_only();
+  void unset_read_only();
   void toggle();
 
   static void document_signal(GObject* obj, GeanyDocument* doc,
@@ -32,9 +33,8 @@ class TweakUiAutoReadOnly {
 
  public:
   std::string desc_enable =
-      _("AutoReadOnly: Automatically sets read-only mode when the user does "
-        "not have write permissions.  Permissions are checked on document "
-        "open, reload, and activation.");
+      _("AutoReadOnly: Automatically sets and unsets read-only mode when "
+        "documents are activated, depending on file write permissions.");
   bool enable = false;
 
  private:

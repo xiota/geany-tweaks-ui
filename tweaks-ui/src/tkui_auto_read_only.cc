@@ -24,14 +24,10 @@ void TweakUiAutoReadOnly::initialize() {
         GTK_WIDGET(geany_data->main_widgets->window), "set_file_readonly1"));
   }
 
-  if (enable && main_is_realized()) {
-    guint i = 0;
-    foreach_document(i) { check_read_only(documents[i]); }
-  }
-
+  // Geany API currently allows changing read-only state only via the menu.
+  // The wrong documents are set read only when other document signals are
+  // used because of race conditions.
   GEANY_PSC("document-activate", document_signal, this);
-  GEANY_PSC("document-open", document_signal, this);
-  GEANY_PSC("document-reload", document_signal, this);
 }
 
 void TweakUiAutoReadOnly::document_signal(GObject* obj, GeanyDocument* doc,
@@ -49,12 +45,20 @@ void TweakUiAutoReadOnly::check_read_only(GeanyDocument* doc) {
 
   if (doc->real_path && euidaccess(doc->real_path, W_OK) != 0) {
     set_read_only();
+  } else {
+    unset_read_only();
   }
 }
 
 void TweakUiAutoReadOnly::set_read_only() {
   if (read_only_menu_item) {
     gtk_check_menu_item_set_active(read_only_menu_item, true);
+  }
+}
+
+void TweakUiAutoReadOnly::unset_read_only() {
+  if (read_only_menu_item) {
+    gtk_check_menu_item_set_active(read_only_menu_item, false);
   }
 }
 
