@@ -31,8 +31,8 @@ void TweakUiColorTip::initialize() {
     }
   }
 
-  GEANY_PSC("document-open", document_signal, this);
-  GEANY_PSC("document-new", document_signal, this);
+  GEANY_PSC_AFTER("document-open", document_signal, this);
+  GEANY_PSC_AFTER("document-new", document_signal, this);
   GEANY_PSC("document-close", document_close, this);
   GEANY_PSC("editor-notify", editor_notify, this);
 

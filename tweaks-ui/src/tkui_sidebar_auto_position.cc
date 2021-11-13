@@ -62,8 +62,8 @@ void TweakUiSidebarAutoPosition::disconnect() { connect(false); }
 
 void TweakUiSidebarAutoPosition::connect(bool enable) {
   if (enable && geany_hpane && !ulHandlePanePosition) {
-    ulHandlePanePosition = g_signal_connect(GTK_WIDGET(geany_hpane), "draw",
-                                            G_CALLBACK(hpane_callback), this);
+    ulHandlePanePosition = g_signal_connect_after(
+        GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(hpane_callback), this);
   }
 
   if (!enable && geany_hpane && ulHandlePanePosition) {

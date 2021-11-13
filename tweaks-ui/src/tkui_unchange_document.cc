@@ -20,7 +20,6 @@
 
 void TweakUiUnchangeDocument::initialize() {
   GEANY_PSC("editor-notify", editor_notify, this);
-  // GEANY_PSC("document-activate", document_signal, this);
 }
 
 bool TweakUiUnchangeDocument::editor_notify(GObject *object,
@@ -37,13 +36,10 @@ void TweakUiUnchangeDocument::document_signal(GObject *obj, GeanyDocument *doc,
 }
 
 void TweakUiUnchangeDocument::unchange(GeanyDocument *doc) {
-  if (!enable || !DOC_VALID(doc)) {
+  if (!enable || !DOC_VALID(doc) || !doc->changed) {
     return;
   }
-
-  if (doc->real_path == nullptr) {
-    if (0 == scintilla_send_message(doc->editor->sci, SCI_GETLENGTH, 0, 0)) {
-      document_set_text_changed(doc, false);
-    }
+  if (sci_get_length(doc->editor->sci) == 0) {
+    document_set_text_changed(doc, false);
   }
 }

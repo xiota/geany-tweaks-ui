@@ -38,6 +38,10 @@ extern GeanyData *geany_data;
   } while (0)
 
 #define GEANY_PSC(sig, cb, data)                                            \
+  plugin_signal_connect(geany_plugin, nullptr, (sig), false, G_CALLBACK(cb), \
+                        data)
+
+#define GEANY_PSC_AFTER(sig, cb, data)                                            \
   plugin_signal_connect(geany_plugin, nullptr, (sig), true, G_CALLBACK(cb), \
                         data)
 

@@ -91,8 +91,8 @@ void TweakUiWindowGeometry::disconnect() { connect(false); }
 
 void TweakUiWindowGeometry::connect(bool enable) {
   if (enable && geany_hpane && !ulHandleGeometry) {
-    ulHandleGeometry = g_signal_connect(GTK_WIDGET(geany_hpane), "draw",
-                                        G_CALLBACK(geometry_callback), this);
+    ulHandleGeometry = g_signal_connect_after(
+        GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(geometry_callback), this);
   }
 
   if (!enable && geany_hpane && ulHandleGeometry) {

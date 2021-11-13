@@ -128,6 +128,12 @@ bool tkui_key_binding(int key_id) {
     case TKUI_KEY_TOGGLE_READONLY:
       settings.auto_read_only.toggle();
       break;
+    case TKUI_KEY_REDETECT_FILETYPE:
+      settings.detect_filetype_on_reload.redetect_filetype();
+      break;
+    case TKUI_KEY_REDETECT_FILETYPE_FORCE:
+      settings.detect_filetype_on_reload.force_redetect_filetype();
+      break;
     default:
       return false;
   }
@@ -227,15 +233,29 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
                        GdkModifierType(0), "tweaks_ui_toggle_readonly",
                        _("Toggle document read-only state"), nullptr);
 
+  keybindings_set_item(gKeyGroup, TKUI_KEY_REDETECT_FILETYPE, nullptr, 0,
+                       GdkModifierType(0), "tweaks_ui_redetect_filetype",
+                       _("Redetect filetype.  Switch to detected type if the "
+                         "current type is likely incorrect."),
+                       nullptr);
+
+  keybindings_set_item(
+      gKeyGroup, TKUI_KEY_REDETECT_FILETYPE_FORCE, nullptr, 0,
+      GdkModifierType(0), "tweaks_ui_redetect_filetype_force",
+      _("Redetect fietype.  Switch to detected type unconditionally."),
+      nullptr);
+
   // initialize hide menubar
   settings.hide_menubar.initialize(gKeyGroup,
                                    TKUI_KEY_TOGGLE_MENUBAR_VISIBILITY);
 
   settings.auto_read_only.initialize();
-  settings.colortip.initialize();
   settings.column_markers.initialize();
-  settings.markword.initialize();
+  settings.detect_filetype_on_reload.initialize();
   settings.unchange_document.initialize();
+
+  settings.colortip.initialize();
+  settings.markword.initialize();
 
   if (g_handle_reload_config == 0) {
     g_handle_reload_config = 1;
@@ -327,7 +347,8 @@ void geany_load_module(GeanyPlugin *plugin) {
   plugin->funcs->configure = tkui_plugin_configure;
   plugin->funcs->callbacks = nullptr;
 
-  GEANY_PSC("geany-startup-complete", tkui_signal_startup_complete, nullptr);
+  GEANY_PSC_AFTER("geany-startup-complete", tkui_signal_startup_complete,
+                  nullptr);
 
   // register
   GEANY_PLUGIN_REGISTER(plugin, 226);

@@ -96,6 +96,14 @@ void TweakUiSettings::save(bool bSession) {
     kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
   }
 
+  // DetectFileTypeOnReload
+  if (!bSession) {
+    kf_set_comment("detect_filetype_on_reload",
+                   "\n " + detect_filetype_on_reload.desc_enable);
+    kf_set_boolean("detect_filetype_on_reload",
+                   detect_filetype_on_reload.enable);
+  }
+
   // unchange document
   if (!bSession) {
     kf_set_comment("unchange_document_enable",
@@ -213,6 +221,9 @@ void TweakUiSettings::load() {
   hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
   hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
   hide_menubar.previous_state = kf_get_boolean("menubar_previous_state", true);
+
+  detect_filetype_on_reload.enable =
+      kf_get_boolean("detect_filetype_on_reload", false);
 
   unchange_document.enable = kf_get_boolean("unchange_document_enable", false);
 
