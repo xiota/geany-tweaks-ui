@@ -229,10 +229,14 @@ void TweakUiSettings::load() {
     window_geometry.width = kf_get_integer("geometry_width", -1, 0);
     window_geometry.height = kf_get_integer("geometry_height", -1, 0);
 
-    window_geometry.xpos_maximized = kf_get_integer("geometry_xpos_maximized", -1, INT_MIN);
-    window_geometry.ypos_maximized = kf_get_integer("geometry_ypos_maximized", -1, INT_MIN);
-    window_geometry.width_maximized = kf_get_integer("geometry_width_maximized", -1, 0);
-    window_geometry.height_maximized = kf_get_integer("geometry_height_maximized", -1, 0);
+    window_geometry.xpos_maximized =
+        kf_get_integer("geometry_xpos_maximized", -1, INT_MIN);
+    window_geometry.ypos_maximized =
+        kf_get_integer("geometry_ypos_maximized", -1, INT_MIN);
+    window_geometry.width_maximized =
+        kf_get_integer("geometry_width_maximized", -1, 0);
+    window_geometry.height_maximized =
+        kf_get_integer("geometry_height_maximized", -1, 0);
 
     window_geometry.sidebar_maximized =
         kf_get_integer("geometry_sidebar_maximized", -1, 0);
