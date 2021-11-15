@@ -95,13 +95,13 @@ void TweakUiSidebarAutoPosition::update_hpane() {
     update_position();
   }
 
-  static bool maximized_previous = false;
-
   GdkWindowState wstate =
       gdk_window_get_state(gtk_widget_get_window(geany_window));
 
   bool fullscreen = wstate & GDK_WINDOW_STATE_FULLSCREEN;
   bool maximized_current = wstate & GDK_WINDOW_STATE_MAXIMIZED;
+
+  static bool maximized_previous = !maximized_current;
 
   // doesn't work well with full screen
   if (fullscreen) {
