@@ -116,15 +116,6 @@ void TweakUiColumnMarkers::get_columns(std::string &strColumns,
   }
 }
 
-std::pair<std::string, std::string> TweakUiColumnMarkers::get_columns() {
-  std::string strColumns;
-  std::string strColors;
-
-  get_columns(strColumns, strColors);
-
-  return std::make_pair(strColumns, strColors);
-}
-
 void TweakUiColumnMarkers::add_column(std::string strColumn,
                                       std::string strColor) {
   char *ptr = nullptr;
@@ -163,12 +154,11 @@ void TweakUiColumnMarkers::add_column(std::string strColumn,
   add_column(column_val, color_val);
 }
 
-void TweakUiColumnMarkers::set_columns(std::string strColumns,
-                                       std::string strColors) {
+void TweakUiColumnMarkers::update_columns() {
   clear_columns();
 
-  auto vs_columns = split_string(strColumns, ";");
-  auto vs_colors = split_string(strColors, ";");
+  auto vs_columns = split_string(str_columns, ";");
+  auto vs_colors = split_string(str_colors, ";");
 
   const int len_a = vs_columns.size();
   const int len_b = vs_colors.size();
@@ -179,4 +169,6 @@ void TweakUiColumnMarkers::set_columns(std::string strColumns,
       add_column(vs_columns[i], vs_colors[i]);
     }
   }
+
+  show();
 }

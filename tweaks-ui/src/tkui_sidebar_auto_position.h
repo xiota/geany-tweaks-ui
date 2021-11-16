@@ -23,7 +23,6 @@
 class TweakUiSidebarAutoPosition {
  public:
   void initialize();
-  bool getEnabled() const;
   void setEnabled(bool const val);
   void disconnect();
 
@@ -32,6 +31,7 @@ class TweakUiSidebarAutoPosition {
       _("SidebarAutoSize: Autosize the sidebar to keep the specified a "
         "number of columns visible in the editor.  Increase the value to make "
         "room for line numbers.");
+  bool enable = false;
   int position_maximized = -1;
   int position_normal = -1;
   int columns_maximized = -1;
@@ -45,7 +45,6 @@ class TweakUiSidebarAutoPosition {
                                  gpointer user_data);
 
  private:
-  bool enabled = false;
   bool bPanedLeft = true;
   ulong ulHandlePanePosition = false;
   GtkWidget *geany_window = nullptr;

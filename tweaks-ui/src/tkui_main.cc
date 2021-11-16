@@ -54,7 +54,7 @@ bool g_handle_reload_config = false;
 gboolean reload_config(gpointer user_data) {
   settings.load();
 
-  settings.column_markers.show_idle();
+  settings.column_markers.update_columns();
   settings.hide_menubar.startup();
 
   settings.sidebar_auto_position.initialize();
@@ -88,7 +88,7 @@ void tkui_pref_open_config_folder(GtkWidget *self, GtkWidget *dialog) {
 }
 
 void tkui_pref_edit_config(GtkWidget *self, GtkWidget *dialog) {
-  const std::string &filename = settings.get_config_file();
+  const std::string &filename = settings.config_file;
   if (filename.empty()) {
     return;
   }
@@ -164,7 +164,7 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   geany_editor = GTK_NOTEBOOK(geany->main_widgets->notebook);
   geany_menubar = ui_lookup_widget(GTK_WIDGET(geany_window), "hbox_menubar");
 
-  settings.open();
+  settings.initialize();
   settings.load();
 
   // setup menu
@@ -272,7 +272,7 @@ void tkui_plugin_cleanup(GeanyPlugin *plugin, gpointer data) {
   settings.window_geometry.disconnect();
 
   settings.save_session();
-  settings.close();
+  settings.kf_close();
 }
 
 GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,

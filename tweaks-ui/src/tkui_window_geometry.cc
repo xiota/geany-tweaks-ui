@@ -76,26 +76,24 @@ void TweakUiWindowGeometry::initialize() {
       gdk_window_move_resize(gdk_window, xpos, ypos, width, height);
     }
 
-    connect(enabled);
+    connect(enable);
   }
 }
 
-bool TweakUiWindowGeometry::getEnabled() const { return enabled; }
-
 void TweakUiWindowGeometry::setEnabled(bool const val) {
-  enabled = val;
-  connect(enabled);
+  enable = val;
+  connect(enable);
 }
 
 void TweakUiWindowGeometry::disconnect() { connect(false); }
 
-void TweakUiWindowGeometry::connect(bool enable) {
-  if (enable && geany_hpane && !ulHandleGeometry) {
+void TweakUiWindowGeometry::connect(bool val) {
+  if (val && geany_hpane && !ulHandleGeometry) {
     ulHandleGeometry = g_signal_connect_after(
         GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(geometry_callback), this);
   }
 
-  if (!enable && geany_hpane && ulHandleGeometry) {
+  if (!val && geany_hpane && ulHandleGeometry) {
     g_clear_signal_handler(&ulHandleGeometry, GTK_WIDGET(geany_hpane));
   }
 }
@@ -104,8 +102,8 @@ gboolean TweakUiWindowGeometry::geometry_callback(GtkWidget *window,
                                                   cairo_t *cr,
                                                   gpointer user_data) {
   TweakUiWindowGeometry *self = (TweakUiWindowGeometry *)user_data;
-  if (!self->enabled) {
-    self->connect(self->enabled);
+  if (!self->enable) {
+    self->connect(self->enable);
     return false;
   }
 
@@ -114,8 +112,8 @@ gboolean TweakUiWindowGeometry::geometry_callback(GtkWidget *window,
 }
 
 void TweakUiWindowGeometry::restore_geometry() {
-  if (!enabled) {
-    connect(enabled);
+  if (!enable) {
+    connect(enable);
   }
 
   GdkWindow *gdk_window = gtk_widget_get_window(geany_window);
@@ -145,8 +143,8 @@ void TweakUiWindowGeometry::restore_geometry() {
 }
 
 void TweakUiWindowGeometry::update_geometry() {
-  if (!enabled) {
-    connect(enabled);
+  if (!enable) {
+    connect(enable);
   }
 
   GdkWindow *gdk_window = gtk_widget_get_window(geany_window);

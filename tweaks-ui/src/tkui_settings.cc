@@ -21,171 +21,200 @@
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void TweakUiSettings::open() {
-  keyfile = g_key_file_new();
+void TweakUiSettings::initialize() {
+  // AutoReadOnly
+  add_setting(&auto_read_only.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "auto_read_only", "\n " + auto_read_only.desc_enable, false);
 
-  config_file =
-      cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
-                                   "tweaks", "tweaks-ui.conf", nullptr));
-  std::string conf_dn = g_path_get_dirname(config_file.c_str());
-  g_mkdir_with_parents(conf_dn.c_str(), 0755);
+  // HideMenubar
+  add_setting(&hide_menubar.hide_on_start, TKUI_PREF_TYPE_BOOLEAN,
+              "menubar_hide_on_start", "\n " + hide_menubar.desc_hide_on_start,
+              false);
+  add_setting(&hide_menubar.restore_state, TKUI_PREF_TYPE_BOOLEAN,
+              "menubar_restore_state", "   " + hide_menubar.desc_restore_state,
+              false);
 
-  // if file does not exist, create it
-  if (!g_file_test(config_file.c_str(), G_FILE_TEST_EXISTS)) {
-    file_set_contents(config_file, "[tweaks]");
-    load();
-    save();
-    save();
+  if (hide_menubar.restore_state) {
+    add_setting(&hide_menubar.previous_state,
+                TKUI_PREF_TYPE_BOOLEAN, "menubar_previous_state", {}, true);
   }
+
+  // DetectFileTypeOnReload
+  add_setting(&detect_filetype_on_reload.enable,
+              TKUI_PREF_TYPE_BOOLEAN, "detect_filetype_on_reload",
+              "\n " + detect_filetype_on_reload.desc_enable, false);
+
+  // unchange document
+  add_setting(&unchange_document.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "unchange_document_enable", "\n " + unchange_document.desc_enable,
+              false);
+
+  // Window Geometry
+  add_setting(&window_geometry.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "geometry_enable", "\n " + window_geometry.description, false);
+  add_setting(&window_geometry.geometry_update,
+              TKUI_PREF_TYPE_BOOLEAN, "geometry_update",
+              "   " + window_geometry.desc_geometry_update, false);
+  add_setting(&window_geometry.sidebar_enable,
+              TKUI_PREF_TYPE_BOOLEAN, "geometry_sidebar",
+              "  " + window_geometry.desc_sidebar_enable, false);
+  add_setting(&window_geometry.msgwin_enable,
+              TKUI_PREF_TYPE_BOOLEAN, "geometry_msgwin",
+              "   " + window_geometry.desc_msgwin_enable, false);
+
+  add_setting(&window_geometry.xpos, TKUI_PREF_TYPE_INTEGER,
+              "geometry_xpos", {}, true);
+  add_setting(&window_geometry.ypos, TKUI_PREF_TYPE_INTEGER,
+              "geometry_ypos", {}, true);
+  add_setting(&window_geometry.width, TKUI_PREF_TYPE_INTEGER,
+              "geometry_width", {}, true);
+  add_setting(&window_geometry.height, TKUI_PREF_TYPE_INTEGER,
+              "geometry_height", {}, true);
+
+  add_setting(&window_geometry.xpos_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_xpos_maximized", {}, true);
+  add_setting(&window_geometry.ypos_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_ypos_maximized", {}, true);
+  add_setting(&window_geometry.width_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_width_maximized", {}, true);
+  add_setting(&window_geometry.height_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_height_maximized", {}, true);
+
+  add_setting(&window_geometry.sidebar_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_sidebar_maximized", {}, true);
+  add_setting(&window_geometry.sidebar_normal,
+              TKUI_PREF_TYPE_INTEGER, "geometry_sidebar_normal", {}, true);
+  add_setting(&window_geometry.msgwin_maximized,
+              TKUI_PREF_TYPE_INTEGER, "geometry_msgwin_maximized", {}, true);
+  add_setting(&window_geometry.msgwin_normal,
+              TKUI_PREF_TYPE_INTEGER, "geometry_msgwin_normal", {}, true);
+
+  // sidebar auto size
+  add_setting(&sidebar_auto_position.enable,
+              TKUI_PREF_TYPE_BOOLEAN, "sidebar_auto_size_enable",
+              "\n " + sidebar_auto_position.description, false);
+
+  add_setting(&sidebar_auto_position.columns_normal,
+              TKUI_PREF_TYPE_INTEGER, "sidebar_auto_size_normal", {}, true);
+  add_setting(&sidebar_auto_position.columns_maximized,
+              TKUI_PREF_TYPE_INTEGER, "sidebar_auto_size_maximized", {}, true);
+
+  // ColorTip
+  add_setting(&colortip.color_tooltip, TKUI_PREF_TYPE_BOOLEAN,
+              "colortip_tooltip", "\n " + colortip.desc_color_tooltip, false);
+  add_setting(&colortip.color_tooltip_size, TKUI_PREF_TYPE_STRING,
+              "colortip_tooltip_size", "   " + colortip.desc_color_tooltip_size,
+              false);
+  add_setting(&colortip.color_chooser, TKUI_PREF_TYPE_BOOLEAN,
+              "colortip_chooser", "   " + colortip.desc_color_chooser, false);
+
+  // MarkWord
+  add_setting(&markword.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "markword_enable", "\n " + markword.desc_enable, false);
+  add_setting(&markword.single_click_deselect,
+              TKUI_PREF_TYPE_BOOLEAN, "markword_single_click_deselect",
+              "   " + markword.desc_single_click_deselect, false);
+
+  // ColumnMarker
+  add_setting(&column_markers.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "column_marker_enable", "\n " + column_markers.desc_enable,
+              false);
+
+  add_setting(&column_markers.str_columns, TKUI_PREF_TYPE_STRING,
+              "column_marker_columns", {}, false);
+  add_setting(&column_markers.str_colors, TKUI_PREF_TYPE_STRING,
+              "column_marker_colors", {}, false);
 }
 
-void TweakUiSettings::close() {
-  if (keyfile) {
-    g_key_file_free(keyfile);
-    keyfile = nullptr;
-  }
-}
-
-void TweakUiSettings::reset() {
-  if (config_file.empty()) {
-    open();
-  }
-
-  {  // delete if file exists
-    GFile *file = g_file_new_for_path(config_file.c_str());
-    if (!g_file_trash(file, nullptr, nullptr)) {
-      g_file_delete(file, nullptr, nullptr);
-    }
-    g_object_unref(file);
-  }
-
-  // file_set_contents(config_file, "[tweaks]");
-
-  TweakUiSettings new_settings;
-  new_settings.open();
-  new_settings.close();
-}
-
-void TweakUiSettings::save(bool bSession) {
+void TweakUiSettings::load() {
   if (!keyfile) {
+    kf_open();
+  }
+
+  g_key_file_load_from_file(keyfile, config_file.c_str(),
+                            GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS), nullptr);
+
+  if (!g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
     return;
   }
 
-  bSaveInProgress = true;
+  for (auto pref : pref_entries) {
+    switch (pref.type) {
+      case TKUI_PREF_TYPE_BOOLEAN:
+        if (kf_has_key(pref.name)) {
+          *(bool *)pref.setting = g_key_file_get_boolean(
+              keyfile, TKUI_KF_GROUP, pref.name.c_str(), nullptr);
+        }
+        break;
+      case TKUI_PREF_TYPE_INTEGER:
+        if (kf_has_key(pref.name)) {
+          *(int *)pref.setting = g_key_file_get_integer(
+              keyfile, TKUI_KF_GROUP, pref.name.c_str(), nullptr);
+        }
+        break;
+      case TKUI_PREF_TYPE_DOUBLE:
+        if (kf_has_key(pref.name)) {
+          *(double *)pref.setting = g_key_file_get_double(
+              keyfile, TKUI_KF_GROUP, pref.name.c_str(), nullptr);
+        }
+        break;
+      case TKUI_PREF_TYPE_STRING:
+        if (kf_has_key(pref.name)) {
+          char *val = g_key_file_get_string(keyfile, TKUI_KF_GROUP,
+                                            pref.name.c_str(), nullptr);
+          *(std::string *)pref.setting = cstr_assign(val);
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
+  // prevent auto size and window geometry conflict
+  if (sidebar_auto_position.enable) {
+    window_geometry.sidebar_enable = false;
+    window_geometry.sidebar_maximized = -1;
+    window_geometry.sidebar_normal = -1;
+  }
+}
+
+void TweakUiSettings::save_session() { save(true); }
+
+void TweakUiSettings::save(bool bSession) {
   // Load old contents in case user changed file outside of GUI
   g_key_file_load_from_file(keyfile, config_file.c_str(),
                             GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS), nullptr);
 
-  // AutoReadOnly
-  if (!bSession) {
-    kf_set_comment("auto_read_only", "\n " + auto_read_only.desc_enable);
-    kf_set_boolean("auto_read_only", auto_read_only.enable);
-  }
+  for (auto pref : pref_entries) {
+    if (bSession && !pref.session) {
+      continue;
+    }
 
-  // HideMenubar
-  if (!bSession) {
-    kf_set_comment("menubar_hide_on_start",
-                   "\n " + hide_menubar.desc_hide_on_start);
-    kf_set_boolean("menubar_hide_on_start", hide_menubar.hide_on_start);
-    kf_set_comment("menubar_restore_state",
-                   "   " + hide_menubar.desc_restore_state);
-    kf_set_boolean("menubar_restore_state", hide_menubar.restore_state);
-  }
-  if (hide_menubar.restore_state) {
-    kf_set_boolean("menubar_previous_state", hide_menubar.get_state());
-  }
-
-  // DetectFileTypeOnReload
-  if (!bSession) {
-    kf_set_comment("detect_filetype_on_reload",
-                   "\n " + detect_filetype_on_reload.desc_enable);
-    kf_set_boolean("detect_filetype_on_reload",
-                   detect_filetype_on_reload.enable);
-  }
-
-  // unchange document
-  if (!bSession) {
-    kf_set_comment("unchange_document_enable",
-                   "\n " + unchange_document.desc_enable);
-    kf_set_boolean("unchange_document_enable", unchange_document.enable);
-  }
-
-  // Window Geometry
-  if (!bSession) {
-    kf_set_comment("geometry_enable", "\n " + window_geometry.description);
-    kf_set_boolean("geometry_enable", window_geometry.getEnabled());
-    kf_set_comment("geometry_update",
-                   "   " + window_geometry.desc_geometry_update);
-    kf_set_boolean("geometry_update", window_geometry.geometry_update);
-    kf_set_comment("geometry_sidebar",
-                   "   " + window_geometry.desc_sidebar_enable);
-    kf_set_boolean("geometry_sidebar", window_geometry.sidebar_enable);
-    kf_set_comment("geometry_msgwin",
-                   "   " + window_geometry.desc_msgwin_enable);
-    kf_set_boolean("geometry_msgwin", window_geometry.msgwin_enable);
-  }
-  kf_set_integer("geometry_xpos", window_geometry.xpos);
-  kf_set_integer("geometry_ypos", window_geometry.ypos);
-  kf_set_integer("geometry_width", window_geometry.width);
-  kf_set_integer("geometry_height", window_geometry.height);
-
-  kf_set_integer("geometry_xpos_maximized", window_geometry.xpos_maximized);
-  kf_set_integer("geometry_ypos_maximized", window_geometry.ypos_maximized);
-  kf_set_integer("geometry_width_maximized", window_geometry.width_maximized);
-  kf_set_integer("geometry_height_maximized", window_geometry.height_maximized);
-
-  kf_set_integer("geometry_sidebar_maximized",
-                 window_geometry.sidebar_maximized);
-  kf_set_integer("geometry_sidebar_normal", window_geometry.sidebar_normal);
-  kf_set_integer("geometry_msgwin_maximized", window_geometry.msgwin_maximized);
-  kf_set_integer("geometry_msgwin_normal", window_geometry.msgwin_normal);
-
-  // sidebar auto size
-  if (!bSession) {
-    kf_set_comment("sidebar_auto_size_enabled",
-                   "\n " + sidebar_auto_position.description);
-    kf_set_boolean("sidebar_auto_size_enabled",
-                   sidebar_auto_position.getEnabled());
-  }
-  kf_set_integer("sidebar_auto_size_normal",
-                 sidebar_auto_position.columns_normal);
-  kf_set_integer("sidebar_auto_size_maximized",
-                 sidebar_auto_position.columns_maximized);
-
-  // ColorTip
-  if (!bSession) {
-    kf_set_comment("colortip_tooltip", "\n " + colortip.desc_color_tooltip);
-    kf_set_boolean("colortip_tooltip", colortip.color_tooltip);
-
-    kf_set_comment("colortip_tooltip_size",
-                   "   " + colortip.desc_color_tooltip_size);
-    kf_set_string("colortip_tooltip_size", colortip.color_tooltip_size);
-
-    kf_set_comment("colortip_chooser", "   " + colortip.desc_color_chooser);
-    kf_set_boolean("colortip_chooser", colortip.color_chooser);
-  }
-
-  // MarkWord
-  if (!bSession) {
-    kf_set_comment("markword_enable", "\n " + markword.desc_enable);
-    kf_set_boolean("markword_enable", markword.enable);
-    kf_set_comment("markword_single_click_deselect",
-                   "   " + markword.desc_single_click_deselect);
-    kf_set_boolean("markword_single_click_deselect",
-                   markword.single_click_deselect);
-  }
-
-  // ColumnMarker
-  if (!bSession) {
-    kf_set_comment("column_marker_enable", "\n " + column_markers.desc_enable);
-    kf_set_boolean("column_marker_enable", column_markers.enable);
-
-    std::string str_columns;
-    std::string str_colors;
-    column_markers.get_columns(str_columns, str_colors);
-    kf_set_string("column_marker_columns", str_columns);
-    kf_set_string("column_marker_colors", str_colors);
+    switch (pref.type) {
+      case TKUI_PREF_TYPE_BOOLEAN:
+        g_key_file_set_boolean(keyfile, TKUI_KF_GROUP, pref.name.c_str(),
+                               *reinterpret_cast<bool *>(pref.setting));
+        break;
+      case TKUI_PREF_TYPE_INTEGER:
+        g_key_file_set_integer(keyfile, TKUI_KF_GROUP, pref.name.c_str(),
+                               *reinterpret_cast<int *>(pref.setting));
+        break;
+      case TKUI_PREF_TYPE_DOUBLE:
+        g_key_file_set_double(keyfile, TKUI_KF_GROUP, pref.name.c_str(),
+                              *reinterpret_cast<double *>(pref.setting));
+        break;
+      case TKUI_PREF_TYPE_STRING:
+        g_key_file_set_string(
+            keyfile, TKUI_KF_GROUP, pref.name.c_str(),
+            reinterpret_cast<std::string *>(pref.setting)->c_str());
+        break;
+      default:
+        break;
+    }
+    if (!pref.comment.empty()) {
+      g_key_file_set_comment(keyfile, TKUI_KF_GROUP, pref.name.c_str(),
+                             (" " + pref.comment).c_str(), nullptr);
+    }
   }
 
   // Store back on disk
@@ -196,177 +225,62 @@ void TweakUiSettings::save(bool bSession) {
   }
 }
 
-void TweakUiSettings::save_session() {
-  if (!keyfile) {
-    return;
+void TweakUiSettings::reset() {
+  if (config_file.empty()) {
+    kf_open();
   }
 
-  save(true);
-}
-
-void TweakUiSettings::load() {
-  if (!keyfile) {
-    return;
+  {  // delete if file exists
+    GFile *file = g_file_new_for_path(config_file.c_str());
+    if (!g_file_trash(file, nullptr, nullptr)) {
+      g_file_delete(file, nullptr, nullptr);
+    }
+    g_object_unref(file);
   }
 
-  g_key_file_load_from_file(keyfile, config_file.c_str(),
-                            GKeyFileFlags(G_KEY_FILE_KEEP_COMMENTS), nullptr);
-
-  if (!g_key_file_has_group(keyfile, TKUI_KF_GROUP)) {
-    return;
-  }
-
-  auto_read_only.enable = kf_get_boolean("auto_read_only", false);
-
-  hide_menubar.hide_on_start = kf_get_boolean("menubar_hide_on_start", false);
-  hide_menubar.restore_state = kf_get_boolean("menubar_restore_state", false);
-  hide_menubar.previous_state = kf_get_boolean("menubar_previous_state", true);
-
-  detect_filetype_on_reload.enable =
-      kf_get_boolean("detect_filetype_on_reload", false);
-
-  unchange_document.enable = kf_get_boolean("unchange_document_enable", false);
-
-  {  // Window Geometry
-    bool enabled = kf_get_boolean("geometry_enable", false);
-    window_geometry.setEnabled(enabled);
-
-    window_geometry.geometry_update = kf_get_boolean("geometry_update", false);
-    window_geometry.sidebar_enable = kf_get_boolean("geometry_sidebar", false);
-    window_geometry.msgwin_enable = kf_get_boolean("geometry_msgwin", false);
-
-    window_geometry.xpos = kf_get_integer("geometry_xpos", -1, INT_MIN);
-    window_geometry.ypos = kf_get_integer("geometry_ypos", -1, INT_MIN);
-    window_geometry.width = kf_get_integer("geometry_width", -1, 0);
-    window_geometry.height = kf_get_integer("geometry_height", -1, 0);
-
-    window_geometry.xpos_maximized =
-        kf_get_integer("geometry_xpos_maximized", -1, INT_MIN);
-    window_geometry.ypos_maximized =
-        kf_get_integer("geometry_ypos_maximized", -1, INT_MIN);
-    window_geometry.width_maximized =
-        kf_get_integer("geometry_width_maximized", -1, 0);
-    window_geometry.height_maximized =
-        kf_get_integer("geometry_height_maximized", -1, 0);
-
-    window_geometry.sidebar_maximized =
-        kf_get_integer("geometry_sidebar_maximized", -1, 0);
-    window_geometry.sidebar_normal =
-        kf_get_integer("geometry_sidebar_normal", -1, 0);
-    window_geometry.msgwin_maximized =
-        kf_get_integer("geometry_msgwin_maximized", -1, 0);
-    window_geometry.msgwin_normal =
-        kf_get_integer("geometry_msgwin_normal", -1, 0);
-  }
-
-  {  // sidebar auto size
-    bool enabled = kf_get_boolean("sidebar_auto_size_enabled", false);
-    sidebar_auto_position.setEnabled(enabled);
-
-    sidebar_auto_position.columns_normal =
-        kf_get_integer("sidebar_auto_size_normal", 76, 0);
-    sidebar_auto_position.columns_maximized =
-        kf_get_integer("sidebar_auto_size_maximized", 100, 0);
-  }
-
-  // prevent auto size and window geometry conflict
-  if (sidebar_auto_position.getEnabled()) {
-    window_geometry.sidebar_enable = false;
-    window_geometry.sidebar_maximized = -1;
-    window_geometry.sidebar_normal = -1;
-  }
-
-  colortip.color_tooltip = kf_get_boolean("colortip_tooltip", false);
-  colortip.setSize(kf_get_string("colortip_tooltip_size", "small"));
-  colortip.color_chooser = kf_get_boolean("colortip_chooser", false);
-
-  markword.enable = kf_get_boolean("markword_enable", false);
-  markword.single_click_deselect =
-      kf_get_boolean("markword_single_click_deselect", true);
-
-  {
-    column_markers.enable = kf_get_boolean("column_marker_enable", false);
-
-    std::string str_columns;
-    std::string str_colors;
-
-    str_columns =
-        kf_get_string("column_marker_columns",
-                      "60;72;80;88;96;104;112;120;128;136;144;152;160;");
-    str_colors =
-        kf_get_string("column_marker_colors",
-                      "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;#e5e5e5;#e5e5e5;"
-                      "#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;");
-
-    column_markers.set_columns(str_columns, str_colors);
-  }
+  TweakUiSettings new_settings;
+  new_settings.initialize();
+  new_settings.kf_open();
+  new_settings.save();
+  new_settings.kf_close();
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Keyfile operations
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void TweakUiSettings::kf_open() {
+  keyfile = g_key_file_new();
+
+  config_file =
+      cstr_assign(g_build_filename(geany_data->app->configdir, "plugins",
+                                   "tweaks", "tweaks-ui.conf", nullptr));
+  std::string conf_dn = g_path_get_dirname(config_file.c_str());
+  g_mkdir_with_parents(conf_dn.c_str(), 0755);
+
+  // if file does not exist, create it
+  if (!g_file_test(config_file.c_str(), G_FILE_TEST_EXISTS)) {
+    file_set_contents(config_file, "[" TKUI_KF_GROUP "]");
+    save();
+  }
+}
+
+void TweakUiSettings::kf_close() {
+  if (keyfile) {
+    g_key_file_free(keyfile);
+    keyfile = nullptr;
+  }
+}
 
 bool TweakUiSettings::kf_has_key(std::string const &key) {
   return g_key_file_has_key(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
 }
 
-void TweakUiSettings::kf_set_boolean(std::string const &key, bool const &val) {
-  g_key_file_set_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), val);
-}
-
-bool TweakUiSettings::kf_get_boolean(std::string const &key, bool const &def) {
-  if (kf_has_key(key)) {
-    return g_key_file_get_boolean(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
-  } else {
-    return def;
-  }
-}
-
-void TweakUiSettings::kf_set_integer(std::string const &key, int const &val) {
-  g_key_file_set_integer(keyfile, TKUI_KF_GROUP, key.c_str(), val);
-}
-
-int TweakUiSettings::kf_get_integer(std::string const &key, int const &def,
-                                    int const &min) {
-  if (kf_has_key(key)) {
-    int val =
-        g_key_file_get_integer(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
-
-    if (val < min) {
-      return min;
-    } else {
-      return val;
-    }
-  } else {
-    return def;
-  }
-}
-
-void TweakUiSettings::kf_set_string(std::string const &key,
-                                    std::string const &val) {
-  g_key_file_set_string(keyfile, TKUI_KF_GROUP, key.c_str(), val.c_str());
-}
-
-std::string TweakUiSettings::kf_get_string(std::string const &key,
-                                           std::string const &def) {
-  if (kf_has_key(key)) {
-    char *val =
-        g_key_file_get_string(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
-    return cstr_assign(val);
-  } else {
-    return def;
-  }
-}
-
-void TweakUiSettings::kf_set_comment(std::string const &key,
-                                     std::string const &val) {
-  if (key.empty()) {
-    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, nullptr, val.c_str(),
-                           nullptr);
-  } else {
-    g_key_file_set_comment(keyfile, TKUI_KF_GROUP, key.c_str(),
-                           (" " + val).c_str(), nullptr);
-  }
+void TweakUiSettings::add_setting(tkuiSetting *setting,
+                                  TweakUiSettingsPrefType const &type,
+                                  std::string const &name,
+                                  std::string const &comment,
+                                  bool const &session) {
+  TweakUiSettingsPref pref{type, name, comment, session, setting};
+  pref_entries.push_back(pref);
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
