@@ -45,7 +45,6 @@ void TweakUiDetectFileType::redetect_filetype(GeanyDocument *doc) {
     // Avoids changing *.h files to C after they have been changed to C++.
     char **pattern = doc->file_type->pattern;
     for (int i = 0; pattern[i] != nullptr; ++i) {
-      msgwin_status_add("pattern = %s", pattern[i]);
       if (g_pattern_match_simple(pattern[i], doc->file_name)) {
         keep_type = true;
         break;

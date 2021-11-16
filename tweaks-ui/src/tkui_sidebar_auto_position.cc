@@ -25,7 +25,7 @@ void TweakUiSidebarAutoPosition::initialize() {
     geany_window = geany_data->main_widgets->window;
     geany_sidebar = geany_data->main_widgets->sidebar_notebook;
     geany_hpane = ui_lookup_widget(GTK_WIDGET(geany_window), "hpaned1");
-    connect(enabled);
+    connect(enable);
 
     bPanedLeft = geany_sidebar == gtk_paned_get_child1(GTK_PANED(geany_hpane));
   }
@@ -51,22 +51,20 @@ void TweakUiSidebarAutoPosition::update_position() {
   }
 }
 
-bool TweakUiSidebarAutoPosition::getEnabled() const { return enabled; }
-
 void TweakUiSidebarAutoPosition::setEnabled(bool const val) {
-  enabled = val;
-  connect(enabled);
+  enable = val;
+  connect(enable);
 }
 
 void TweakUiSidebarAutoPosition::disconnect() { connect(false); }
 
-void TweakUiSidebarAutoPosition::connect(bool enable) {
-  if (enable && geany_hpane && !ulHandlePanePosition) {
+void TweakUiSidebarAutoPosition::connect(bool val) {
+  if (val && geany_hpane && !ulHandlePanePosition) {
     ulHandlePanePosition = g_signal_connect_after(
         GTK_WIDGET(geany_hpane), "draw", G_CALLBACK(hpane_callback), this);
   }
 
-  if (!enable && geany_hpane && ulHandlePanePosition) {
+  if (!val && geany_hpane && ulHandlePanePosition) {
     g_clear_signal_handler(&ulHandlePanePosition, GTK_WIDGET(geany_hpane));
   }
 }
@@ -75,8 +73,8 @@ gboolean TweakUiSidebarAutoPosition::hpane_callback(GtkWidget *hpane,
                                                     cairo_t *cr,
                                                     gpointer user_data) {
   TweakUiSidebarAutoPosition *self = (TweakUiSidebarAutoPosition *)user_data;
-  if (!self->enabled) {
-    self->connect(self->enabled);
+  if (!self->enable) {
+    self->connect(self->enable);
     return false;
   }
 
@@ -86,8 +84,8 @@ gboolean TweakUiSidebarAutoPosition::hpane_callback(GtkWidget *hpane,
 
 void TweakUiSidebarAutoPosition::update_hpane() {
   if (!geany_hpane || !geany_window) {
-    enabled = false;
-    connect(enabled);
+    enable = false;
+    connect(enable);
     return;
   }
 

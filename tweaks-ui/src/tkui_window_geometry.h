@@ -23,7 +23,6 @@
 class TweakUiWindowGeometry {
  public:
   void initialize();
-  bool getEnabled() const;
   void setEnabled(bool const val);
   void disconnect();
   void restore_geometry();
@@ -33,6 +32,7 @@ class TweakUiWindowGeometry {
       _("WindowGeometry: Save and restore sidebar and message window "
         "positions.  This feature is intended to be used with "
         "\"Save Window Size\" and \"Save Window Position\" enabled.");
+  bool enable = false;
   std::string desc_geometry_update =
       _("Update positions when they are changed.  "
         "When false, the previously saved settings will be used.");
@@ -66,7 +66,6 @@ class TweakUiWindowGeometry {
                                     gpointer user_data);
 
  private:
-  bool enabled = false;
   bool bRestoreInProgress = false;
   ulong ulHandleGeometry = false;
   GtkWidget *geany_window = nullptr;

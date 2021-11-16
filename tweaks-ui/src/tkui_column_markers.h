@@ -33,8 +33,8 @@ class TweakUiColumnMarkers {
   void clear_columns();
   void add_column(int nColumn, int nColor);
   void add_column(std::string strColumn, std::string strColor);
-  void set_columns(std::string strColumns, std::string strColors);
   void get_columns(std::string &strColumns, std::string &strColors);
+  void update_columns();
 
   std::pair<std::string, std::string> get_columns();
 
@@ -43,6 +43,10 @@ class TweakUiColumnMarkers {
       _("ColumnMarkers: Show column markers at the specified columns.  "
         "Colors are in #RRGGBB or #RGB formats.");
   bool enable = false;
+  std::string str_columns{"60;72;80;88;96;104;112;120;128;136;144;152;160;"};
+  std::string str_colors{
+      "#e5e5e5;#b0d0ff;#ffc0ff;#e5e5e5;#ffb0a0;#e5e5e5;#e5e5e5;"
+      "#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;#e5e5e5;"};
 
  private:
   static gboolean show_idle_callback(TweakUiColumnMarkers *self);

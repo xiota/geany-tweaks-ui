@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "tkui_auto_read_only.h"
 #include "tkui_colortip.h"
 #include "tkui_column_markers.h"
@@ -31,19 +33,39 @@
 
 #define TKUI_KF_GROUP "tweaks"
 
+typedef void tkuiSetting;
+
+enum TweakUiSettingsPrefType {
+  TKUI_PREF_TYPE_NONE,
+  TKUI_PREF_TYPE_BOOLEAN,
+  TKUI_PREF_TYPE_INTEGER,
+  TKUI_PREF_TYPE_DOUBLE,
+  TKUI_PREF_TYPE_STRING,
+};
+
+class TweakUiSettingsPref {
+ public:
+  TweakUiSettingsPrefType type;
+  std::string name;
+  std::string comment;
+  bool session;
+  tkuiSetting *setting;
+};
+
 class TweakUiSettings {
  public:
-  void open();
-  void close();
+  void initialize();
+
   void load();
   void save(bool bSession = false);
   void save_session();
   void reset();
-
-  std::string get_config_file() const { return config_file; }
-  std::string get_session_file() const { return session_file; }
+  void kf_open();
+  void kf_close();
 
  public:
+  std::string config_file;
+
   TweakUiAutoReadOnly auto_read_only;
   TweakUiColumnMarkers column_markers;
   TweakUiHideMenubar hide_menubar;
@@ -59,32 +81,11 @@ class TweakUiSettings {
  private:
   bool kf_has_key(std::string const &key);
 
-  void kf_set_boolean(std::string const &key, bool const &val);
-  bool kf_get_boolean(std::string const &key, bool const &def);
-
-  void kf_set_double(std::string const &key, double const &val);
-  double kf_get_double(std::string const &key, double const &def,
-                       double const &min);
-
-  void kf_set_integer(std::string const &key, int const &val);
-  int kf_get_integer(std::string const &key, int const &def, int const &min);
-
-  void kf_set_string(std::string const &key, std::string const &val);
-  std::string kf_get_string(std::string const &key, std::string const &def);
-
-  void kf_set_comment(std::string const &key, std::string const &val);
+  void add_setting(tkuiSetting *setting, TweakUiSettingsPrefType const &type,
+                   std::string const &name, std::string const &comment,
+                   bool const &session);
 
  private:
-  bool bSaveInProgress = false;
   GKeyFile *keyfile = nullptr;
-  std::string config_file;
-  std::string session_file;
+  std::vector<TweakUiSettingsPref> pref_entries;
 };
-
-// Macros to make loading settings easier
-
-#define GET_KEY(T, key) \
-  g_key_file_get_##T(keyfile, TKUI_KF_GROUP, (key), nullptr)
-
-#define SET_KEY(T, key, _val) \
-  g_key_file_set_##T(keyfile, TKUI_KF_GROUP, (key), (_val))
