@@ -26,10 +26,15 @@ void TweakUiHideMenubar::initialize(GeanyKeyGroup *group, gsize key_id) {
   if (geany_data && geany_data->main_widgets->window) {
     geany_menubar = ui_lookup_widget(
         GTK_WIDGET(geany_data->main_widgets->window), "hbox_menubar");
+    update();
   }
 }
 
-void TweakUiHideMenubar::startup() {
+void TweakUiHideMenubar::update() {
+  if (!geany_menubar) {
+    return;
+  }
+
   if (hide_on_start) {
     hide();
   } else if (restore_state && !previous_state) {
@@ -46,10 +51,14 @@ void TweakUiHideMenubar::toggle() {
 }
 
 bool TweakUiHideMenubar::get_state() {
-  return gtk_widget_is_visible(geany_menubar);
+  previous_state = gtk_widget_is_visible(geany_menubar);
+  return previous_state;
 }
 
-void TweakUiHideMenubar::show() { gtk_widget_show(geany_menubar); }
+void TweakUiHideMenubar::show() {
+  previous_state = true;
+  gtk_widget_show(geany_menubar);
+}
 
 bool TweakUiHideMenubar::hide() {
   if (gtk_widget_is_visible(geany_menubar)) {
@@ -59,6 +68,7 @@ bool TweakUiHideMenubar::hide() {
           cstr_assign(gtk_accelerator_name(keybinding->key, keybinding->mods));
       msgwin_status_add(_("Menubar has been hidden.  To reshow it, use: %s"),
                         val.c_str());
+      previous_state = false;
       return true;
     } else {
       msgwin_status_add(

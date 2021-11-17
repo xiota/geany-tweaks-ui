@@ -23,8 +23,8 @@
 
 void TweakUiSettings::initialize() {
   // AutoReadOnly
-  add_setting(&auto_read_only.enable, TKUI_PREF_TYPE_BOOLEAN,
-              "auto_read_only", "\n " + auto_read_only.desc_enable, false);
+  add_setting(&auto_read_only.enable, TKUI_PREF_TYPE_BOOLEAN, "auto_read_only",
+              "\n " + auto_read_only.desc_enable, false);
 
   // HideMenubar
   add_setting(&hide_menubar.hide_on_start, TKUI_PREF_TYPE_BOOLEAN,
@@ -34,14 +34,12 @@ void TweakUiSettings::initialize() {
               "menubar_restore_state", "   " + hide_menubar.desc_restore_state,
               false);
 
-  if (hide_menubar.restore_state) {
-    add_setting(&hide_menubar.previous_state,
-                TKUI_PREF_TYPE_BOOLEAN, "menubar_previous_state", {}, true);
-  }
+  add_setting(&hide_menubar.previous_state, TKUI_PREF_TYPE_BOOLEAN,
+              "menubar_previous_state", {}, true);
 
   // DetectFileTypeOnReload
-  add_setting(&detect_filetype_on_reload.enable,
-              TKUI_PREF_TYPE_BOOLEAN, "detect_filetype_on_reload",
+  add_setting(&detect_filetype_on_reload.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "detect_filetype_on_reload",
               "\n " + detect_filetype_on_reload.desc_enable, false);
 
   // unchange document
@@ -52,52 +50,52 @@ void TweakUiSettings::initialize() {
   // Window Geometry
   add_setting(&window_geometry.enable, TKUI_PREF_TYPE_BOOLEAN,
               "geometry_enable", "\n " + window_geometry.description, false);
-  add_setting(&window_geometry.geometry_update,
-              TKUI_PREF_TYPE_BOOLEAN, "geometry_update",
-              "   " + window_geometry.desc_geometry_update, false);
-  add_setting(&window_geometry.sidebar_enable,
-              TKUI_PREF_TYPE_BOOLEAN, "geometry_sidebar",
-              "  " + window_geometry.desc_sidebar_enable, false);
-  add_setting(&window_geometry.msgwin_enable,
-              TKUI_PREF_TYPE_BOOLEAN, "geometry_msgwin",
-              "   " + window_geometry.desc_msgwin_enable, false);
+  add_setting(&window_geometry.geometry_update, TKUI_PREF_TYPE_BOOLEAN,
+              "geometry_update", "   " + window_geometry.desc_geometry_update,
+              false);
+  add_setting(&window_geometry.sidebar_enable, TKUI_PREF_TYPE_BOOLEAN,
+              "geometry_sidebar", "  " + window_geometry.desc_sidebar_enable,
+              false);
+  add_setting(&window_geometry.msgwin_enable, TKUI_PREF_TYPE_BOOLEAN,
+              "geometry_msgwin", "   " + window_geometry.desc_msgwin_enable,
+              false);
 
-  add_setting(&window_geometry.xpos, TKUI_PREF_TYPE_INTEGER,
-              "geometry_xpos", {}, true);
-  add_setting(&window_geometry.ypos, TKUI_PREF_TYPE_INTEGER,
-              "geometry_ypos", {}, true);
-  add_setting(&window_geometry.width, TKUI_PREF_TYPE_INTEGER,
-              "geometry_width", {}, true);
+  add_setting(&window_geometry.xpos, TKUI_PREF_TYPE_INTEGER, "geometry_xpos",
+              {}, true);
+  add_setting(&window_geometry.ypos, TKUI_PREF_TYPE_INTEGER, "geometry_ypos",
+              {}, true);
+  add_setting(&window_geometry.width, TKUI_PREF_TYPE_INTEGER, "geometry_width",
+              {}, true);
   add_setting(&window_geometry.height, TKUI_PREF_TYPE_INTEGER,
               "geometry_height", {}, true);
 
-  add_setting(&window_geometry.xpos_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_xpos_maximized", {}, true);
-  add_setting(&window_geometry.ypos_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_ypos_maximized", {}, true);
-  add_setting(&window_geometry.width_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_width_maximized", {}, true);
-  add_setting(&window_geometry.height_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_height_maximized", {}, true);
+  add_setting(&window_geometry.xpos_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_xpos_maximized", {}, true);
+  add_setting(&window_geometry.ypos_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_ypos_maximized", {}, true);
+  add_setting(&window_geometry.width_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_width_maximized", {}, true);
+  add_setting(&window_geometry.height_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_height_maximized", {}, true);
 
-  add_setting(&window_geometry.sidebar_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_sidebar_maximized", {}, true);
-  add_setting(&window_geometry.sidebar_normal,
-              TKUI_PREF_TYPE_INTEGER, "geometry_sidebar_normal", {}, true);
-  add_setting(&window_geometry.msgwin_maximized,
-              TKUI_PREF_TYPE_INTEGER, "geometry_msgwin_maximized", {}, true);
-  add_setting(&window_geometry.msgwin_normal,
-              TKUI_PREF_TYPE_INTEGER, "geometry_msgwin_normal", {}, true);
+  add_setting(&window_geometry.sidebar_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_sidebar_maximized", {}, true);
+  add_setting(&window_geometry.sidebar_normal, TKUI_PREF_TYPE_INTEGER,
+              "geometry_sidebar_normal", {}, true);
+  add_setting(&window_geometry.msgwin_maximized, TKUI_PREF_TYPE_INTEGER,
+              "geometry_msgwin_maximized", {}, true);
+  add_setting(&window_geometry.msgwin_normal, TKUI_PREF_TYPE_INTEGER,
+              "geometry_msgwin_normal", {}, true);
 
   // sidebar auto size
-  add_setting(&sidebar_auto_position.enable,
-              TKUI_PREF_TYPE_BOOLEAN, "sidebar_auto_size_enable",
+  add_setting(&sidebar_auto_position.enable, TKUI_PREF_TYPE_BOOLEAN,
+              "sidebar_auto_size_enable",
               "\n " + sidebar_auto_position.description, false);
 
-  add_setting(&sidebar_auto_position.columns_normal,
-              TKUI_PREF_TYPE_INTEGER, "sidebar_auto_size_normal", {}, true);
-  add_setting(&sidebar_auto_position.columns_maximized,
-              TKUI_PREF_TYPE_INTEGER, "sidebar_auto_size_maximized", {}, true);
+  add_setting(&sidebar_auto_position.columns_normal, TKUI_PREF_TYPE_INTEGER,
+              "sidebar_auto_size_normal", {}, true);
+  add_setting(&sidebar_auto_position.columns_maximized, TKUI_PREF_TYPE_INTEGER,
+              "sidebar_auto_size_maximized", {}, true);
 
   // ColorTip
   add_setting(&colortip.color_tooltip, TKUI_PREF_TYPE_BOOLEAN,
@@ -109,10 +107,10 @@ void TweakUiSettings::initialize() {
               "colortip_chooser", "   " + colortip.desc_color_chooser, false);
 
   // MarkWord
-  add_setting(&markword.enable, TKUI_PREF_TYPE_BOOLEAN,
-              "markword_enable", "\n " + markword.desc_enable, false);
-  add_setting(&markword.single_click_deselect,
-              TKUI_PREF_TYPE_BOOLEAN, "markword_single_click_deselect",
+  add_setting(&markword.enable, TKUI_PREF_TYPE_BOOLEAN, "markword_enable",
+              "\n " + markword.desc_enable, false);
+  add_setting(&markword.single_click_deselect, TKUI_PREF_TYPE_BOOLEAN,
+              "markword_single_click_deselect",
               "   " + markword.desc_single_click_deselect, false);
 
   // ColumnMarker
@@ -274,12 +272,12 @@ bool TweakUiSettings::kf_has_key(std::string const &key) {
   return g_key_file_has_key(keyfile, TKUI_KF_GROUP, key.c_str(), nullptr);
 }
 
-void TweakUiSettings::add_setting(tkuiSetting *setting,
-                                  TweakUiSettingsPrefType const &type,
+void TweakUiSettings::add_setting(TkuiSetting *setting,
+                                  TkuiSettingType const &type,
                                   std::string const &name,
                                   std::string const &comment,
                                   bool const &session) {
-  TweakUiSettingsPref pref{type, name, comment, session, setting};
+  TkuiSettingPref pref{type, name, comment, session, setting};
   pref_entries.push_back(pref);
 }
 

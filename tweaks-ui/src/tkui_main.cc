@@ -55,7 +55,7 @@ gboolean reload_config(gpointer user_data) {
   settings.load();
 
   settings.column_markers.update_columns();
-  settings.hide_menubar.startup();
+  settings.hide_menubar.update();
 
   settings.sidebar_auto_position.initialize();
   settings.window_geometry.initialize();
@@ -138,15 +138,6 @@ bool tkui_key_binding(int key_id) {
       return false;
   }
   return true;
-}
-
-}  // namespace
-
-namespace {
-
-void tkui_signal_startup_complete(GObject *obj, GeanyDocument *doc,
-                                  gpointer data) {
-  settings.hide_menubar.startup();
 }
 
 }  // namespace
@@ -346,9 +337,6 @@ void geany_load_module(GeanyPlugin *plugin) {
   plugin->funcs->help = nullptr;
   plugin->funcs->configure = tkui_plugin_configure;
   plugin->funcs->callbacks = nullptr;
-
-  GEANY_PSC_AFTER("geany-startup-complete", tkui_signal_startup_complete,
-                  nullptr);
 
   // register
   GEANY_PLUGIN_REGISTER(plugin, 226);
