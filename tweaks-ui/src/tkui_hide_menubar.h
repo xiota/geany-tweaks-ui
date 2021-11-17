@@ -25,8 +25,8 @@ class TweakUiHideMenubar {
   void initialize(GeanyKeyGroup *group, gsize key_id);
   bool hide();
   void show();
-  void startup();
   void toggle();
+  void update();
   bool get_state();
 
  public:

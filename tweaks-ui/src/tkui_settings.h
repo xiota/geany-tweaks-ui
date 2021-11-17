@@ -33,9 +33,9 @@
 
 #define TKUI_KF_GROUP "tweaks"
 
-typedef void tkuiSetting;
+typedef void TkuiSetting;
 
-enum TweakUiSettingsPrefType {
+enum TkuiSettingType {
   TKUI_PREF_TYPE_NONE,
   TKUI_PREF_TYPE_BOOLEAN,
   TKUI_PREF_TYPE_INTEGER,
@@ -43,13 +43,13 @@ enum TweakUiSettingsPrefType {
   TKUI_PREF_TYPE_STRING,
 };
 
-class TweakUiSettingsPref {
+class TkuiSettingPref {
  public:
-  TweakUiSettingsPrefType type;
+  TkuiSettingType type;
   std::string name;
   std::string comment;
   bool session;
-  tkuiSetting *setting;
+  TkuiSetting *setting;
 };
 
 class TweakUiSettings {
@@ -81,11 +81,11 @@ class TweakUiSettings {
  private:
   bool kf_has_key(std::string const &key);
 
-  void add_setting(tkuiSetting *setting, TweakUiSettingsPrefType const &type,
+  void add_setting(TkuiSetting *setting, TkuiSettingType const &type,
                    std::string const &name, std::string const &comment,
                    bool const &session);
 
  private:
   GKeyFile *keyfile = nullptr;
-  std::vector<TweakUiSettingsPref> pref_entries;
+  std::vector<TkuiSettingPref> pref_entries;
 };
