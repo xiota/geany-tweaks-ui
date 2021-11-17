@@ -45,8 +45,6 @@ void TweakUiAutoReadOnly::check_read_only(GeanyDocument* doc) {
 
   if (doc->real_path && euidaccess(doc->real_path, W_OK) != 0) {
     set_read_only();
-  } else {
-    unset_read_only();
   }
 }
 
