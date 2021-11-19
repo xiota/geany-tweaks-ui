@@ -33,10 +33,14 @@
 
 #define TKUI_KF_GROUP "tweaks"
 
-typedef void TkuiSetting;
+union TkuiSetting {
+  bool tkuiBoolean;
+  int tkuiInteger;
+  double tkuiDouble;
+  std::string tkuiString;
+};
 
 enum TkuiSettingType {
-  TKUI_PREF_TYPE_NONE,
   TKUI_PREF_TYPE_BOOLEAN,
   TKUI_PREF_TYPE_INTEGER,
   TKUI_PREF_TYPE_DOUBLE,
