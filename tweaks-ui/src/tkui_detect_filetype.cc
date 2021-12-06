@@ -22,8 +22,8 @@ void TweakUiDetectFileType::initialize() {
   GEANY_PSC_AFTER("document-reload", document_signal, this);
 }
 
-void TweakUiDetectFileType::document_signal(
-    GObject *obj, GeanyDocument *doc, TweakUiDetectFileType *self) {
+void TweakUiDetectFileType::document_signal(GObject *obj, GeanyDocument *doc,
+                                            TweakUiDetectFileType *self) {
   if (!self->enable || !DOC_VALID(doc) || !doc->file_name) {
     return;
   }
@@ -53,12 +53,14 @@ void TweakUiDetectFileType::redetect_filetype(GeanyDocument *doc) {
   }
 
   if (!keep_type) {
-    document_set_filetype(doc, filetypes_detect_from_file(doc->file_name));
+    auto new_type = filetypes_detect_from_file(doc->file_name);
+    if (new_type->id != GEANY_FILETYPES_NONE) {
+      document_set_filetype(doc, new_type);
+    }
   }
 }
 
-void TweakUiDetectFileType::force_redetect_filetype(
-    GeanyDocument *doc) {
+void TweakUiDetectFileType::force_redetect_filetype(GeanyDocument *doc) {
   if (!DOC_VALID(doc)) {
     doc = document_get_current();
   }
