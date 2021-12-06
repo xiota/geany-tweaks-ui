@@ -1,5 +1,5 @@
 /*
- * Auxiliary Functions - Fountain Screenplay Processor
+ * Fountain Screenplay Processor - auxiliary functions
  * Copyright 2021 xiota
  *
  * This program is free software: you can redistribute it and/or modify
@@ -54,10 +54,23 @@ std::string to_lower(std::string s);
 
 bool is_upper(std::string const &s);
 
+std::string &encode_entities_inplace(std::string &input,
+                                     bool const bProcessAllEntities = false);
+std::string encode_entities(std::string input,
+                            bool const bProcessAllEntities = false);
+
+std::string &decode_entities_inplace(std::string &input);
+std::string decode_entities(std::string input);
+
 std::string cstr_assign(char *input);
+
+std::vector<std::string> cstrv_assign(char **input);
+std::vector<std::string> cstrv_copy(char const *const *input);
+std::vector<char *> cstrv_get(std::vector<std::string> const input);
+
 std::string file_get_contents(std::string const &filename);
 
 bool file_set_contents(std::string const &filename,
                        std::string const &contents);
 
-void print_regex_error(std::regex_error &e);
+void print_regex_error(std::regex_error &e, char const *file, int const line);
