@@ -1,193 +1,36 @@
-ACLOCAL_AMFLAGS = -I build/cache -I build -I build/bundled -I geanypy/m4 --install
-AM_DISTCHECK_CONFIGURE_FLAGS = --with-geany-libdir='$${libdir}'
+ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = po
+geany_plugindir = $(libdir)/geany
+geany_plugin_LTLIBRARIES = tweaks-ui.la
 
-if ENABLE_UTILSLIB
-SUBDIRS += utils
-endif
+tweaks_ui_la_CXXFLAGS = $(GEANY_CFLAGS) \
+	-DG_LOG_DOMAIN=\""Tweaks-UI"\"
 
-if ENABLE_ADDONS
-SUBDIRS += addons
-endif
+tweaks_ui_la_LIBADD = $(GEANY_LIBS)
+tweaks_ui_la_LDFLAGS = -module -avoid-version
 
-if ENABLE_AUTOCLOSE
-SUBDIRS += autoclose
-endif
-
-if ENABLE_AUTOMARK
-SUBDIRS += automark
-endif
-
-if ENABLE_CODENAV
-SUBDIRS += codenav
-endif
-
-if ENABLE_COMMANDER
-SUBDIRS += commander
-endif
-
-if ENABLE_DEBUGGER
-SUBDIRS += debugger
-endif
-
-if ENABLE_DEFINEFORMAT
-SUBDIRS += defineformat
-endif
-
-if ENABLE_DEVHELP
-SUBDIRS += devhelp
-endif
-
-if ENABLE_GEANYCTAGS
-SUBDIRS += geanyctags
-endif
-
-if ENABLE_GEANYDOC
-SUBDIRS += geanydoc
-endif
-
-if ENABLE_GEANYEXTRASEL
-SUBDIRS += geanyextrasel
-endif
-
-if ENABLE_GEANYGENDOC
-SUBDIRS += geanygendoc
-endif
-
-if ENABLE_GEANYINSERTNUM
-SUBDIRS += geanyinsertnum
-endif
-
-if ENABLE_LATEX
-SUBDIRS += latex
-endif
-
-if ENABLE_GEANYLUA
-SUBDIRS += geanylua
-endif
-
-if ENABLE_GEANYMACRO
-SUBDIRS += geanymacro
-endif
-
-if ENABLE_GEANYMINISCRIPT
-SUBDIRS += geanyminiscript
-endif
-
-if ENABLE_GEANYNUMBEREDBOOKMARKS
-SUBDIRS += geanynumberedbookmarks
-endif
-
-if ENABLE_GEANYPG
-SUBDIRS += geanypg
-endif
-
-if ENABLE_GEANYPRJ
-SUBDIRS += geanyprj
-endif
-
-if ENABLE_GEANYPY
-SUBDIRS += geanypy
-endif
-
-
-if ENABLE_GEANYVC
-SUBDIRS += geanyvc
-endif
-
-if ENABLE_GENIUSPASTE
-SUBDIRS += geniuspaste
-endif
-
-if ENABLE_GITCHANGEBAR
-SUBDIRS += git-changebar
-endif
-
-if ENABLE_KEYRECORD
-SUBDIRS += keyrecord
-endif
-
-if ENABLE_LINEOPERATIONS
-SUBDIRS += lineoperations
-endif
-
-if ENABLE_LIPSUM
-SUBDIRS += lipsum
-endif
-
-if ENABLE_MARKDOWN
-SUBDIRS += markdown
-endif
-
-if ENABLE_MULTITERM
-SUBDIRS += multiterm
-endif
-
-if ENABLE_OVERVIEW
-SUBDIRS += overview
-endif
-
-if ENABLE_PAIRTAGHIGHLIGHTER
-SUBDIRS += pairtaghighlighter
-endif
-
-if ENABLE_POHELPER
-SUBDIRS += pohelper
-endif
-
-if ENABLE_PRETTY_PRINTER
-SUBDIRS += pretty-printer
-endif
-
-if ENABLE_PROJECTORGANIZER
-SUBDIRS += projectorganizer
-endif
-
-if ENABLE_SCOPE
-SUBDIRS += scope
-endif
-
-if ENABLE_SENDMAIL
-SUBDIRS += sendmail
-endif
-
-if ENABLE_SHIFTCOLUMN
-SUBDIRS += shiftcolumn
-endif
-
-if ENABLE_SPELLCHECK
-SUBDIRS += spellcheck
-endif
-
-if ENABLE_TABLECONVERT
-SUBDIRS += tableconvert
-endif
-
-if ENABLE_TREEBROWSER
-SUBDIRS += treebrowser
-endif
-
-if ENABLE_TWEAKS_UI
-SUBDIRS += tweaks-ui
-endif
-
-if ENABLE_UPDATECHECKER
-SUBDIRS += updatechecker
-endif
-
-if ENABLE_VIMODE
-SUBDIRS += vimode
-endif
-
-if ENABLE_WEBHELPER
-SUBDIRS += webhelper
-endif
-
-if ENABLE_WORKBENCH
-SUBDIRS += workbench
-endif
-
-if ENABLE_XMLSNIPPETS
-SUBDIRS += xmlsnippets
-endif
+tweaks_ui_la_SOURCES = \
+	src/tkui_main.cc \
+	src/tkui_main.h \
+	src/tkui_settings.cc \
+	src/tkui_settings.h \
+	src/tkui_auto_read_only.cc \
+	src/tkui_auto_read_only.h \
+	src/tkui_colortip.cc \
+	src/tkui_colortip.h \
+	src/tkui_column_markers.cc \
+	src/tkui_column_markers.h \
+	src/tkui_detect_filetype.cc \
+	src/tkui_detect_filetype.h \
+	src/tkui_hide_menubar.cc \
+	src/tkui_hide_menubar.h \
+	src/tkui_markword.cc \
+	src/tkui_markword.h \
+	src/tkui_sidebar_auto_position.cc \
+	src/tkui_sidebar_auto_position.h \
+	src/tkui_unchange_document.cc \
+	src/tkui_unchange_document.h \
+	src/tkui_window_geometry.cc \
+	src/tkui_window_geometry.h \
+	src/auxiliary.cc \
+	src/auxiliary.h
