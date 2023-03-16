@@ -39,7 +39,9 @@ void TweakUiUnchangeDocument::unchange(GeanyDocument *doc) {
   if (!enable || !DOC_VALID(doc) || !doc->changed) {
     return;
   }
-  if (sci_get_length(doc->editor->sci) == 0) {
+
+  if (DOC_FILENAME(doc) == GEANY_STRING_UNTITLED &&
+      sci_get_length(doc->editor->sci) == 0) {
     document_set_text_changed(doc, false);
   }
 }
