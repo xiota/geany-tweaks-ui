@@ -1,6 +1,8 @@
 AC_PREREQ([2.71])
 dnl Do not forget when updating version number to do GP_CHECK_GEANY also
-AC_INIT([tweaks_ui],[0.0.1],[xiota])
+
+#AC_INIT (package, version, [bug-report], [tarname], [url])
+AC_INIT([tweaks_ui], m4_esyscmd([./version.sh]), [], [], [https://github.com/xiota/tweaks_ui])
 
 AM_INIT_AUTOMAKE([subdir-objects -Wall])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])

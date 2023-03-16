@@ -323,7 +323,7 @@ GtkWidget *tkui_plugin_configure(GeanyPlugin *plugin, GtkDialog *dialog,
 G_MODULE_EXPORT
 void geany_load_module(GeanyPlugin *plugin) {
   // translation
-  main_locale_init(LOCALEDIR, GETTEXT_PACKAGE);
+  // main_locale_init(LOCALEDIR, GETTEXT_PACKAGE);
 
   // plugin metadata
   plugin->info->name = "Tweaks-UI";
