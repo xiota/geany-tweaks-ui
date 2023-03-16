@@ -233,7 +233,7 @@ gboolean tkui_plugin_init(GeanyPlugin *plugin, gpointer data) {
   keybindings_set_item(
       gKeyGroup, TKUI_KEY_REDETECT_FILETYPE_FORCE, nullptr, 0,
       GdkModifierType(0), "tweaks_ui_redetect_filetype_force",
-      _("Redetect fietype.  Switch to detected type unconditionally."),
+      _("Redetect filetype.  Switch to detected type unconditionally."),
       nullptr);
 
   // initialize hide menubar

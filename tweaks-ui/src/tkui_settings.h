@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <locale>
+#include <string>
 #include <vector>
 
 #include "tkui_auto_read_only.h"

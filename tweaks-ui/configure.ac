@@ -1,6 +1,6 @@
-AC_PREREQ([2.61])
+AC_PREREQ([2.71])
 dnl Do not forget when updating version number to do GP_CHECK_GEANY also
-AC_INIT([tweaks_ui], [0.01.0], [xiota])
+AC_INIT([tweaks_ui],[0.0.1],[xiota])
 
 AM_INIT_AUTOMAKE([subdir-objects -Wall])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -15,7 +15,7 @@ LT_INIT
 
 AC_PROG_CC
 AM_PROG_CC_C_O
-AC_PROG_LIBTOOL
+LT_INIT
 
 AC_PROG_CXX
 AC_PROG_CXXCPP

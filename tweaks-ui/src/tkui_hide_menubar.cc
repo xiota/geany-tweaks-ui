@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "tkui_hide_menubar.h"
+
 #include <string>
 
 #include "auxiliary.h"
-#include "tkui_hide_menubar.h"
 
 void TweakUiHideMenubar::initialize(GeanyKeyGroup *group, gsize key_id) {
   keybinding = keybindings_get_item(group, key_id);

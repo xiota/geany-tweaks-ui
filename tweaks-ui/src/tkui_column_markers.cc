@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "auxiliary.h"
 #include "tkui_column_markers.h"
+
+#include "auxiliary.h"
 
 void TweakUiColumnMarkers::initialize() {
   if (enable && main_is_realized()) {

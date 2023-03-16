@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <cstring>
+#include <iterator>
 #include <regex>
 #include <string>
 #include <vector>

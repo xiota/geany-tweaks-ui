@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <string>
-
 #include "tkui_sidebar_auto_position.h"
+
+#include <string>
 
 void TweakUiSidebarAutoPosition::initialize() {
   if (geany_data && geany_data->main_widgets) {

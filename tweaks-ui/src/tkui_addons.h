@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <geanyplugin.h>
+#include <locale>
 
-#include <string>
+#include "geanyplugin.h"
 
 extern GeanyPlugin *geany_plugin;
 extern GeanyData *geany_data;
@@ -37,11 +37,11 @@ extern GeanyData *geany_data;
     _z_ = nullptr;       \
   } while (0)
 
-#define GEANY_PSC(sig, cb, data)                                            \
+#define GEANY_PSC(sig, cb, data)                                             \
   plugin_signal_connect(geany_plugin, nullptr, (sig), false, G_CALLBACK(cb), \
                         data)
 
-#define GEANY_PSC_AFTER(sig, cb, data)                                            \
+#define GEANY_PSC_AFTER(sig, cb, data)                                      \
   plugin_signal_connect(geany_plugin, nullptr, (sig), true, G_CALLBACK(cb), \
                         data)
 

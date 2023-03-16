@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "auxiliary.h"
 #include "tkui_colortip.h"
+
+#include "auxiliary.h"
 
 void TweakUiColorTip::initialize() {
   // connect the button-press event for all open documents
